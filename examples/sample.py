@@ -2,7 +2,7 @@ from lemon.app import Lemon
 from lemon.context import Context
 
 
-async def middleware(ctx: Context, nxt: function):
+async def middleware(ctx: Context, nxt):
     ctx.body = {
         'msg': 'hello world'
     }
@@ -18,4 +18,4 @@ app.use(middleware)
 
 app.use(handle)
 
-app.listen(9999)
+app.listen()
