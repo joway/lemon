@@ -1,7 +1,9 @@
 import asyncio
 from functools import partial
+from inspect import signature
 
 from lemon.context import Context
+from lemon.exception import HandlerParamsError
 
 try:
     import uvloop as async_loop
@@ -23,7 +25,8 @@ class HttpProtocol(asyncio.Protocol):
         self.transport = transport
 
     def data_received(self, data):
-        self.transport.write(data)
+        self.ctx.set('body', data)
+        self.exec_handler(self.request_handlers)
 
     def eof_received(self):
         if self.transport.can_write_eof():
@@ -32,10 +35,17 @@ class HttpProtocol(asyncio.Protocol):
     def connection_lost(self, error):
         super().connection_lost(error)
 
-    def exec_handler(self, request_handlers: list):
+    def exec_handler(self, handlers: list):
         try:
-            handler = request_handlers.pop(0)
-            handler(self.ctx, partial(self.exec_handler, request_handlers))
+            _handler = handlers.pop(0)
+            _handler_params = signature(_handler).parameters
+            if 'ctx' in _handler_params:
+                if 'nxt' in _handler_params:
+                    _handler(ctx=self.ctx, nxt=partial(self.exec_handler, request_handlers))
+                else:
+                    _handler(ctx=self.ctx)
+            else:
+                raise HandlerParamsError
         except IndexError:
             return
 
