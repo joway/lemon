@@ -1,4 +1,7 @@
 import asyncio
+from functools import partial
+
+from lemon.context import Context
 
 try:
     import uvloop as async_loop
@@ -7,17 +10,16 @@ except ImportError:
 
 from lemon.log import (
     logger,
-    error_logger,
-)
+    error_logger)
 
 
 class HttpProtocol(asyncio.Protocol):
-    def __init__(self, connections=set()):
+    def __init__(self, request_handlers: list):
         self.transport = None
-        self.connections = connections
+        self.request_handlers = request_handlers
+        self.ctx = Context()
 
     def connection_made(self, transport):
-        self.connections.add(self)
         self.transport = transport
 
     def data_received(self, data):
@@ -30,14 +32,27 @@ class HttpProtocol(asyncio.Protocol):
     def connection_lost(self, error):
         super().connection_lost(error)
 
+    def exec_handler(self, request_handlers: list):
+        try:
+            handler = request_handlers.pop(0)
+            handler(self.ctx, partial(self.exec_handler, request_handlers))
+        except IndexError:
+            return
 
-def serve(host, port):
+
+def serve(host, port, request_handlers):
     logger.info('listen : http://{host}:{port}'.format(
         host=host, port=port,
     ))
     loop = async_loop.new_event_loop()
     asyncio.set_event_loop(loop)
-    server_coroutine = loop.create_server(HttpProtocol, host=host, port=port)
+
+    protocol = HttpProtocol
+    handlers = partial(
+        protocol,
+        request_handlers=request_handlers,
+    )
+    server_coroutine = loop.create_server(handlers, host=host, port=port)
     server = loop.run_until_complete(server_coroutine)
 
     try:
