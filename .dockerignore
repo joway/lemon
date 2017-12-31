@@ -1,0 +1,9 @@
+.git
+.DS_Store
+Dockerfile
+.gitignore
+README.md
+local_settings.py
+config/local_settings.py
+db.sqlite3
+
