@@ -4,7 +4,6 @@ import sys
 LOGGING_CONFIG_DEFAULTS = dict(
     version=1,
     disable_existing_loggers=False,
-
     loggers={
         "root": {
             "level": "INFO",

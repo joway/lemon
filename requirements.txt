@@ -1,1 +1,2 @@
 uvloop==0.9.1
+httptools==0.0.10
