@@ -104,7 +104,7 @@ class HttpProtocol(asyncio.Protocol):
         logger.debug('response body : {0}'.format(self.ctx.body))
 
         try:
-            self.transport.write(self.ctx.res.output())
+            self.transport.write(self.ctx.res.datagram())
         finally:
             if not self.parser.should_keep_alive():
                 logger.debug('keep alive closed')
