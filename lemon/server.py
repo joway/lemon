@@ -61,7 +61,7 @@ class HttpProtocol(asyncio.Protocol):
     def on_headers_complete(self):
         logger.debug('on_headers_complete')
 
-        self.ctx.set_request(Request(
+        self.ctx.req = (Request(
             url_bytes=self.url_bytes,
             headers=self.headers,
             version=self.parser.get_http_version(),
@@ -106,7 +106,7 @@ class HttpProtocol(asyncio.Protocol):
         logger.debug('response body : {0}'.format(self.ctx.body))
 
         try:
-            self.transport.write(self.ctx.response.output())
+            self.transport.write(self.ctx.res.output())
         finally:
             if not self.parser.should_keep_alive():
                 logger.debug('keep alive closed')
