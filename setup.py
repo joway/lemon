@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pylemon',
-    version='0.0.0',
+    version='0.0.1',
     description='An async and lightweight restful framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
