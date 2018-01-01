@@ -19,7 +19,11 @@ except ImportError:
 
 
 class HttpProtocol(asyncio.Protocol):
-    def __init__(self, loop: async_loop.Loop, request_handlers: list):
+    def __init__(self, app, loop: async_loop.Loop, handlers: list):
+        self.app = app
+        self.loop = loop
+        self.handlers = handlers
+
         self.transport = None
         self.parser = None
         self.ctx = None
@@ -27,9 +31,6 @@ class HttpProtocol(asyncio.Protocol):
         self.url_bytes = b''
         self.headers = dict()
         self.parser = HttpRequestParser(self)
-
-        self.loop = loop
-        self.request_handlers = request_handlers
 
     def connection_made(self, transport):
         logger.debug('connection made')
@@ -76,31 +77,30 @@ class HttpProtocol(asyncio.Protocol):
         self.ctx.request.fin_body()
 
         self.loop.create_task(
-            self.exec_handlers(self.request_handlers)
+            self.exec_handlers(self.handlers)
         )
 
     async def exec_handlers(self, handlers: list, handler_pos: int = 0):
         if handler_pos >= len(handlers):
             return
 
-        logger.debug('exec_handlers start, the No.{0} handler'.format(handler_pos))
+        logger.debug('The No.{0} handler started'.format(handler_pos))
 
         try:
             _handler = handlers[handler_pos]
             _handler_params = signature(_handler).parameters
             if 'ctx' in _handler_params:
                 if 'nxt' in _handler_params:
-                    return await _handler(ctx=self.ctx, nxt=partial(self.exec_handlers, handlers, handler_pos + 1))
+                    await _handler(ctx=self.ctx, nxt=partial(self.exec_handlers, handlers, handler_pos + 1))
                 else:
                     await _handler(ctx=self.ctx)
             else:
                 raise HandlerParamsError
-        except IndexError:
-            return
+        finally:
+            if handler_pos == 0:
+                self.write_response()
 
-        self.write_response()
-
-        logger.debug('exec_handlers finished')
+        logger.debug('The No.{0} handler finished'.format(handler_pos))
 
     def write_response(self):
         logger.debug('response body : {0}'.format(self.ctx.body))
@@ -119,7 +119,7 @@ class HttpProtocol(asyncio.Protocol):
         super().connection_lost(error)
 
     def prepare(self):
-        self.ctx = Context() if self.ctx is None else self.ctx
+        self.ctx = Context(app=self.app) if self.ctx is None else self.ctx
 
     def cleanup(self):
         self.ctx = None
@@ -129,7 +129,7 @@ class HttpProtocol(asyncio.Protocol):
         self.headers = dict()
 
 
-def serve(host, port, request_handlers):
+def serve(app, host, port, handlers):
     logger.info('listen : http://{host}:{port}'.format(
         host=host, port=port,
     ))
@@ -140,8 +140,9 @@ def serve(host, port, request_handlers):
     protocol = HttpProtocol
     handlers = partial(
         protocol,
+        app=app,
         loop=loop,
-        request_handlers=request_handlers,
+        handlers=handlers,
     )
     server_coroutine = loop.create_server(handlers, host=host, port=port)
     server = loop.run_until_complete(server_coroutine)

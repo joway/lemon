@@ -1,4 +1,9 @@
-class BasicException(Exception):
+"""
+==========   RuntimeError   ==========
+"""
+
+
+class BasicRuntimeError(RuntimeError):
     def __init__(self, msg=None):
         self.msg = msg or self.__class__.__name__
 
@@ -6,5 +11,16 @@ class BasicException(Exception):
         return str(self.msg)
 
 
-class HandlerParamsError(BasicException):
+class HandlerParamsError(BasicRuntimeError):
     pass
+
+
+"""
+==========   HttpError   ==========
+"""
+
+
+class HttpError(Exception):
+    def __init__(self, status: int, body: str or dict):
+        self.status = status
+        self.body = body
