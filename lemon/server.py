@@ -71,10 +71,10 @@ class HttpProtocol(asyncio.Protocol):
         ))
 
     def on_body(self, body: bytes):
-        self.ctx.request.recv_body(body)
+        self.ctx.req.recv_body(body)
 
     def on_message_complete(self):
-        self.ctx.request.fin_body()
+        self.ctx.req.fin_body()
 
         self.loop.create_task(
             self.exec_handlers(self.handlers)
