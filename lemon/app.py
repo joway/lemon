@@ -1,4 +1,5 @@
 import logging.config
+from asyncio import get_event_loop
 
 from lemon import config
 from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
@@ -25,7 +26,10 @@ class Lemon:
     def use(self, handler):
         self.handlers.append(handler)
 
-    def listen(self, host: str = None, port: str = None):
+    def listen(self, host: str = None, port: str or int = None):
         self.host = host or self.host
-        self.port = port or self.port
+        self.port = str(port) or self.port
         serve(self, self.host, self.port, self.handlers)
+
+    def stop(self):
+        get_event_loop().stop()
