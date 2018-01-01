@@ -25,9 +25,7 @@ class HttpProtocol(asyncio.Protocol):
         self.handlers = handlers
 
         self.transport = None
-        self.parser = None
         self.ctx = None
-
         self.url_bytes = b''
         self.headers = dict()
         self.parser = HttpRequestParser(self)
@@ -111,6 +109,7 @@ class HttpProtocol(asyncio.Protocol):
             if not self.parser.should_keep_alive():
                 logger.debug('keep alive closed')
                 self.transport.close()
+                self.transport = None
             self.cleanup()
 
     def connection_lost(self, error):
@@ -123,9 +122,7 @@ class HttpProtocol(asyncio.Protocol):
 
     def cleanup(self):
         self.ctx = None
-        self.transport = None
-        self.parser = None
-        self.url_bytes = None
+        self.url_bytes = b''
         self.headers = dict()
 
 

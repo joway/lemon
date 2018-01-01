@@ -16,7 +16,7 @@ async def handle(ctx: Context):
     ctx.body['random'] = random()
 
 
-app = Lemon(debug=False)
+app = Lemon(debug=True)
 
 app.use(middleware)
 

@@ -1,3 +1,5 @@
+import json
+
 STATUS_CODES = {
     100: b'Continue',
     101: b'Switching Protocols',
@@ -61,18 +63,25 @@ STATUS_CODES = {
 }
 
 
+class MIME_TYPES:
+    PLAIN = 'text/plain'
+    JSON = 'application/json'
+
+
 class Response:
     def __init__(
             self, body=None, status=200, headers=None,
-            content_type='text/plain', body_bytes=b'',
+            content_type=MIME_TYPES.PLAIN,
     ):
         self.content_type = content_type
         self.body = body
         self.status = status
         self.headers = headers or {}
 
-    @staticmethod
-    def _encode_body(data):
+    def _encode_body(self, data):
+        if isinstance(data, dict):
+            self.content_type = MIME_TYPES.JSON
+            return json.dumps(data).encode()
         try:
             return data.encode()
         except AttributeError:
@@ -91,18 +100,19 @@ class Response:
         return headers
 
     def output(
-            self, version="1.1", keep_alive=False, keep_alive_timeout=None):
+            self, version='1.1', keep_alive=True, keep_alive_timeout=10):
         body_bytes = self._encode_body(self.body)
 
-        # This is all returned in a kind-of funky way
-        # We tried to make this as fast as possible in pure python
         timeout_header = b''
         if keep_alive and keep_alive_timeout is not None:
             timeout_header = b'Keep-Alive: %d\r\n' % keep_alive_timeout
+
         self.headers['Content-Length'] = self.headers.get(
-            'Content-Length', len(body_bytes))
+            'Content-Length', len(body_bytes),
+        )
         self.headers['Content-Type'] = self.headers.get(
-            'Content-Type', self.content_type)
+            'Content-Type', self.content_type,
+        )
 
         headers = self._parse_headers()
 
@@ -118,9 +128,7 @@ class Response:
                    b'%b\r\n'
                    b'%b') % \
                (
-                   version.encode(),
-                   self.status,
-                   status,
+                   version.encode(), self.status, status,
                    b'keep-alive' if keep_alive else b'close',
                    timeout_header,
                    headers,
