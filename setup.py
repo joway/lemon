@@ -12,4 +12,9 @@ setup(
     keywords='lemon restful api async python',
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
+    install_requires=[
+        'uvloop>=0.9.1',
+        'httptools>=0.0.10',
+        'requests>=2.18.4',
+    ],
 )
