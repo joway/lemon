@@ -1,4 +1,4 @@
-# Lemon
+# Lemon 🍋 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon) [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=feature%2Ftestcase)](https://coveralls.io/github/joway/lemon?branch=feature%2Ftestcase)
 
 Lemon is an async and lightweight restful framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
 
@@ -40,10 +40,11 @@ app.listen(port=9999)
 
 ## TODO
 
-- [ ] documentation
-- [ ] lemon router
 - [ ] tests
-- [ ] https
+- [ ] lemon router
+- [ ] wsgi
+- [ ] documentation
 - [ ] cookies
 - [ ] cors
+- [ ] https
 - [ ] benchmark
