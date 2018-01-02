@@ -4,6 +4,8 @@ from multiprocessing import Process
 
 import requests
 
+PORTS = set()
+
 
 class HttpClient:
     def __init__(self):
@@ -19,20 +21,28 @@ class HttpClient:
         )
 
     def get(self, path, params=None):
-        return requests.get('{0}{1}'.format(self.base_url, path), params, headers={'Connection': 'close'})
+        req = requests.get('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
+        req.close()
+        return req
 
-    def create_server(self, func, **kwargs):
-        process = Process(target=func, kwargs=kwargs)
+    def create_server(self, listen, **kwargs):
+        process = Process(target=listen, kwargs=kwargs)
         process.daemon = True
         process.start()
         self.process = process
+        time.sleep(0.1)
 
     def stop_server(self):
         if self.process is not None:
             self.process.terminate()
             while self.process.is_alive():
                 time.sleep(0.1)
+            PORTS.remove(self.port)
 
     @staticmethod
     def random_port():
-        return random.randrange(10000, 30000)
+        port = random.randrange(10000, 30000)
+        while port in PORTS:
+            port = random.randrange(10000, 30000)
+        PORTS.add(port)
+        return port

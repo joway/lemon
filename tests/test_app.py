@@ -1,12 +1,11 @@
-import pytest
-
 from lemon.context import Context
 from tests.base import HttpBasicTest
 
 
 class TestApp(HttpBasicTest):
-    @pytest.mark.serial
     def test_json_response(self):
+        print('test_json_response start')
+
         async def handle(ctx: Context):
             ctx.body = {
                 'ack': 'yeah !',
@@ -20,8 +19,11 @@ class TestApp(HttpBasicTest):
 
         client.stop_server()
 
-    @pytest.mark.serial
+        print('test_json_response stop')
+
     def test_string_response(self):
+        print('test_string_response start')
+
         async def handle(ctx: Context):
             ctx.body = 'xxxxxx'
 
@@ -31,3 +33,4 @@ class TestApp(HttpBasicTest):
         assert req.text == 'xxxxxx'
 
         client.stop_server()
+        print('test_string_response stop')

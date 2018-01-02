@@ -40,10 +40,11 @@ app.listen(port=9999)
 
 ## TODO
 
-- [ ] documentation
-- [ ] lemon router
 - [ ] tests
-- [ ] https
+- [ ] lemon router
+- [ ] wsgi
+- [ ] documentation
 - [ ] cookies
 - [ ] cors
+- [ ] https
 - [ ] benchmark
