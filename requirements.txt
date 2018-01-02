@@ -2,3 +2,5 @@ uvloop==0.9.1
 httptools==0.0.10
 pytest==3.3.1
 requests==2.18.4
+coveralls==1.2.0
+pytest-runner==3.0

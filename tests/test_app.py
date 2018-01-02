@@ -28,6 +28,28 @@ class TestApp(HttpBasicTest):
 
         client.stop_server()
 
+    def test_other_method(self):
+        async def handle(ctx: Context):
+            ctx.body = {
+                'ack': 'yeah !',
+            }
+
+        client = self.create_http_server([handle])
+        req = client.post('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'yeah !'
+        req = client.delete('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'yeah !'
+        req = client.put('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'yeah !'
+
+        client.stop_server()
+
     def test_throw(self):
         async def handle(ctx: Context):
             raise Exception

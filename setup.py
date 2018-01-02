@@ -10,4 +10,6 @@ setup(
     license='MIT',
     packages=['lemon'],
     keywords='lemon restful api async python',
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )

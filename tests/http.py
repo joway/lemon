@@ -21,9 +21,16 @@ class HttpClient:
         )
 
     def get(self, path, params=None):
-        req = requests.get('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
-        req.close()
-        return req
+        return requests.get('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
+
+    def post(self, path, params=None):
+        return requests.get('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
+
+    def put(self, path, params=None):
+        return requests.put('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
+
+    def delete(self, path, params=None):
+        return requests.delete('{0}{1}'.format(self.base_url, path), params=params, headers={'Connection': 'close'})
 
     def create_server(self, listen, **kwargs):
         process = Process(target=listen, kwargs=kwargs)
