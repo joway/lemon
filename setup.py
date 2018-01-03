@@ -16,5 +16,6 @@ setup(
         'uvloop>=0.9.1',
         'httptools>=0.0.10',
         'requests>=2.18.4',
+        'treelib>=1.5.1',
     ],
 )
