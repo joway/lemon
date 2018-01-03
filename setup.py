@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pylemon',
-    version='0.0.2',
+    version='0.0.3',
     description='An async and lightweight restful framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
@@ -17,5 +17,6 @@ setup(
         'httptools>=0.0.10',
         'requests>=2.18.4',
         'treelib>=1.5.1',
+        'requests-toolbelt>=0.8.0',
     ],
 )
