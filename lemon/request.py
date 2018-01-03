@@ -10,7 +10,9 @@ from lemon.exception import RequestParserError
 
 
 class Request(dict):
-    def __init__(self, url_bytes, headers, version, method, transport, **kwargs):
+
+    def __init__(self, url_bytes, headers, version,
+                 method, transport, **kwargs):
         super().__init__(**kwargs)
 
         self.body = None
@@ -77,7 +79,7 @@ class Request(dict):
     def query(self):
         try:
             return json.loads(self.querystring)
-        except:
+        except json.JSONDecoder:
             return {}
 
     @property

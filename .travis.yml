@@ -8,3 +8,4 @@ install:
 script:
   - coverage run --source=lemon setup.py test
   - coveralls
+  - pycodestyle

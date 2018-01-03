@@ -92,10 +92,16 @@ class Response:
         for name, value in self.headers.items():
             try:
                 _headers += \
-                    (b'%b: %b\r\n' % (name.encode(), value.encode('utf-8')))
+                    (b'%b: %b\r\n' % (
+                        name.encode(),
+                        value.encode('utf-8')
+                    ))
             except AttributeError:
                 _headers += \
-                    (b'%b: %b\r\n' % (str(name).encode(), str(value).encode('utf-8')))
+                    (b'%b: %b\r\n' % (
+                        str(name).encode(),
+                        str(value).encode('utf-8')
+                    ))
 
         return _headers
 
