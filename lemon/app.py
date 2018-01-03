@@ -23,12 +23,12 @@ class Lemon:
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
-    def use(self, handler):
-        self.handlers.append(handler)
+    def use(self, *handlers):
+        self.handlers.extend(handlers)
 
     def listen(self, host: str = None, port: str or int = None):
         self.host = host or self.host
-        self.port = str(port) or self.port
+        self.port = str(port or self.port)
         serve(self, self.host, self.port, self.handlers)
 
     def stop(self):

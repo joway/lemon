@@ -15,6 +15,18 @@ class HandlerParamsError(BasicRuntimeError):
     pass
 
 
+class RouterRegisterError(BasicRuntimeError):
+    pass
+
+
+class RouterMatchError(BasicRuntimeError):
+    pass
+
+
+class RequestParserError(BasicRuntimeError):
+    pass
+
+
 '''
 ==========   HttpError   ==========
 '''
