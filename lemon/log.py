@@ -42,7 +42,7 @@ LOGGING_CONFIG_DEFAULTS = dict(
     },
     formatters={
         'generic': {
-            'format': '%(asctime)s [%(process)d] [%(levelname)s] %(message)s',
+            'format': '%(asctime)s [%(module)s] [%(levelname)s] %(message)s',
             'datefmt': '[%Y-%m-%d %H:%M:%S %z]',
             'class': 'logging.Formatter'
         },

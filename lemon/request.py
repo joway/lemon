@@ -1,22 +1,27 @@
 import json
 import socket
-from urllib.parse import urlunparse
+from cgi import parse_header
+from urllib.parse import urlunparse, parse_qs
 
 from httptools import parse_url
+from requests_toolbelt import MultipartDecoder
+
+from lemon.exception import RequestParserError
 
 
 class Request(dict):
     def __init__(self, url_bytes, headers, version, method, transport, **kwargs):
         super().__init__(**kwargs)
 
-        self._body = []
         self.body = None
-
+        self._body = []
+        self._json = None
+        self._form = None
         self._parsed_url = parse_url(url_bytes)
 
         self.headers = headers
         self.version = version
-        self.method = method
+        self.method = method.upper()
         self.transport = transport
 
     @property
@@ -39,6 +44,29 @@ class Request(dict):
         return self._parsed_url.path.decode('utf-8')
 
     @property
+    def json(self):
+        if self._json:
+            return self._json
+        self._json = json.loads(self.body)
+        return self._json
+
+    @property
+    def form(self):
+        if self._form:
+            return self._form
+        content_type, parameters = parse_header(self.type)
+        if content_type == 'application/x-www-form-urlencoded':
+            kv_pairs = parse_qs(self.body.decode('utf-8'))
+            self._form = {p[0]: p[1] for p in kv_pairs}
+        elif content_type == 'multipart/form-data':
+            # TODO: unify form data structure
+            boundary = parameters['boundary'].encode('utf-8')
+            self._form = MultipartDecoder(self.body, self.type, 'utf-8').parts
+        else:
+            raise RequestParserError
+        return self._form
+
+    @property
     def querystring(self):
         if self._parsed_url.query:
             return self._parsed_url.query.decode('utf-8')
@@ -58,7 +86,7 @@ class Request(dict):
 
     @property
     def type(self):
-        return self.headers.get('Content-Type', 'text/plain')
+        return self.headers.get('content-type', 'text/plain')
 
     @property
     def url(self):
