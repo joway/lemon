@@ -1,14 +1,14 @@
 init:
-    pip install -r requirements.txt
+	pip install -r requirements.txt
 
 release:
-    python setup.py sdist upload
+	python setup.py sdist upload
 
 test:
-    python setup.py test
+	python setup.py test
 
 lint:
-    pycodestyle --exclude docs/
+	pycodestyle --exclude docs
 
 docs:
-    sphinx-build -b html docs/source docs/build
+	sphinx-build -b html docs/source docs/build
