@@ -39,7 +39,7 @@ class HttpProtocol(asyncio.Protocol):
         logger.debug('data received')
 
         # init context
-        self.prepare()
+        self.ctx = Context(app=self.app) if self.ctx is None else self.ctx
 
         # enable node.js HTTP parser
         self.parser.feed_data(data)
@@ -122,9 +122,6 @@ class HttpProtocol(asyncio.Protocol):
         logger.debug('connection lost')
 
         super().connection_lost(error)
-
-    def prepare(self):
-        self.ctx = Context(app=self.app) if self.ctx is None else self.ctx
 
     def cleanup(self):
         self.ctx = None

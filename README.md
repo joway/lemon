@@ -5,6 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pylemon/badge/?version=latest)](http://pylemon.readthedocs.io/en/latest/?badge=latest)
 [![PyPi Version](https://img.shields.io/pypi/v/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![Python Version](https://img.shields.io/pypi/pyversions/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
+[![PyPI](https://img.shields.io/pypi/status/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![license](https://img.shields.io/github/license/joway/lemon.svg)](https://github.com/joway/lemon/blob/master/LICENSE)
 
 Lemon is an async and lightweight API framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
