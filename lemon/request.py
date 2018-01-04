@@ -1,8 +1,15 @@
 import json
 import socket
-from urllib.parse import urlunparse
+from cgi import parse_header
+from urllib.parse import urlunparse, parse_qs
 
 from httptools import parse_url
+from requests_toolbelt import MultipartDecoder
+
+from lemon.config import LEMON_SERVER_KEEP_ALIVE_TIMEOUT
+from lemon.const import MIME_TYPES
+from lemon.exception import RequestParserError
+
 
 # class RequestBodyForm:
 #     """Form object for request body when content type
@@ -11,8 +18,6 @@ from httptools import parse_url
 #
 #     def __init__(self):
 #         pass
-from lemon.config import LEMON_SERVER_KEEP_ALIVE_TIMEOUT
-
 
 class Request(dict):
     """The Request object store the current request's fully information
@@ -82,23 +87,23 @@ class Request(dict):
         self._json = json.loads(self.body)
         return self._json
 
-    # @property
-    # def form(self):
-    #     """Transform request body to a dict when content_type
-    #     is 'application/x-www-form-urlencoded' and 'multipart/form-data'
-    #     """
-    #     if self._form:
-    #         return self._form
-    #     content_type, parameters = parse_header(self.type)
-    #     if content_type == MIME_TYPES.APPLICATION_X_WWW_FORM_URLENCODED:
-    #         kv_pairs = parse_qs(self.body.decode('utf-8'))
-    #         self._form = {p[0]: p[1] for p in kv_pairs}
-    #     elif content_type == MIME_TYPES.MULTIPART_FORM_DATA:
-    #         # TODO: unify form data structure
-    #         self._form = MultipartDecoder(self.body, self.type, 'utf-8').parts
-    #     else:
-    #         raise RequestParserError
-    #     return self._form
+    @property
+    def form(self):
+        """Transform request body to a dict when content_type
+        is 'application/x-www-form-urlencoded' and 'multipart/form-data'
+        """
+        if self._form:
+            return self._form
+        content_type, parameters = parse_header(self.type)
+        if content_type == MIME_TYPES.APPLICATION_X_WWW_FORM_URLENCODED:
+            kv_pairs = parse_qs(self.body.decode('utf-8'))
+            self._form = {p[0]: p[1] for p in kv_pairs}
+        elif content_type == MIME_TYPES.MULTIPART_FORM_DATA:
+            # TODO: unify form data structure
+            self._form = MultipartDecoder(self.body, self.type, 'utf-8').parts
+        else:
+            raise RequestParserError
+        return self._form
 
     @property
     def querystring(self):
