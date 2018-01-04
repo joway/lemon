@@ -34,6 +34,10 @@ class RouteTree:
         self.root = self._tree.create_node(tag='', identifier='/')
 
     def add(self, path: str, *handlers):
+        """Register path with its handlers
+        :param path:
+        :param handlers:
+        """
         segments = path.split('/')
 
         if len(segments) == 0:
@@ -57,6 +61,10 @@ class RouteTree:
         return last_node
 
     def match(self, path: str):
+        """Match path
+        :param path:
+        :return: Route object
+        """
         # accurate hit
         leaf = self._tree.get_node(path)
         if leaf:
@@ -89,27 +97,54 @@ class RouteTree:
 class AbstractRouter(metaclass=ABCMeta):
     @abstractmethod
     def use(self, methods: list, path: str, *handlers):
+        """Register routes
+        :param methods: GET|PUT|POST|DELETE
+        :param path: string
+        :param handlers: async function(ctx, [nxt]) list
+        """
         raise NotImplementedError
 
     @abstractmethod
     def routes(self):
+        """Return async function(ctx, [nxt])
+        """
         raise NotImplementedError
 
 
 class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
     def get(self, path: str, *handlers):
+        """Register GET routes
+        :param path: url path
+        :param handlers: async function(ctx, [nxt]) list
+        """
         return self.use([HTTP_METHODS.GET], path, *handlers)
 
     def put(self, path: str, *handlers):
+        """Register PUT routes
+        :param path: url path
+        :param handlers: async function(ctx, [nxt]) list
+        """
         return self.use([HTTP_METHODS.PUT], path, *handlers)
 
     def post(self, path: str, *handlers):
+        """Register POST routes
+        :param path: url path
+        :param handlers: async function(ctx, [nxt]) list
+        """
         return self.use([HTTP_METHODS.POST], path, *handlers)
 
     def delete(self, path: str, *handlers):
+        """Register DELETE routes
+        :param path: url path
+        :param handlers: async function(ctx, [nxt]) list
+        """
         return self.use([HTTP_METHODS.DELETE], path, *handlers)
 
     def all(self, path: str, *handlers):
+        """Register routes into all http methods
+        :param path: url path
+        :param handlers: async function(ctx, [nxt]) list
+        """
         return self.use([
             HTTP_METHODS.GET,
             HTTP_METHODS.PUT,
@@ -129,6 +164,11 @@ class SimpleRouter(AbstractBaseRouter):
         }
 
     def use(self, methods: list, path: str, *handlers):
+        """Register routes
+        :param methods: GET|PUT|POST|DELETE
+        :param path: string
+        :param handlers: async function(ctx, [nxt]) list
+        """
         for method in methods:
             if method not in _HTTP_METHODS:
                 raise RouterRegisterError(
@@ -139,6 +179,9 @@ class SimpleRouter(AbstractBaseRouter):
             self._routes[method][path] = handlers
 
     def routes(self):
+        """Generate async router function(ctx, nxt)
+        """
+
         async def _routes(ctx, nxt):
             method = ctx.req.method
             path = ctx.req.path
@@ -175,18 +218,26 @@ class Router(AbstractBaseRouter):
         }
 
     def use(self, methods: list, path: str, *handlers):
+        """Register routes
+        :param methods: GET|PUT|POST|DELETE
+        :param path: string
+        :param handlers: async function(ctx, [nxt]) list
+        """
         for method in methods:
             if method not in _HTTP_METHODS:
                 raise RouterRegisterError(
                     'Cannot support method : {0}'.format(method)
                 )
-            self.register_handlers(method, path, *handlers)
+            self._register_handlers(method, path, *handlers)
 
     def routes(self):
+        """Generate async router function(ctx, nxt)
+        """
+
         async def _routes(ctx, nxt):
             method = ctx.req.method
             path = ctx.req.path
-            route = self.match_handlers(method=method, path=path)
+            route = self._match_handlers(method=method, path=path)
 
             if route is None:
                 ctx.status = 404
@@ -204,7 +255,7 @@ class Router(AbstractBaseRouter):
 
         return _routes
 
-    def register_handlers(self, method: str, path: str, *handlers):
+    def _register_handlers(self, method: str, path: str, *handlers):
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 
@@ -215,7 +266,7 @@ class Router(AbstractBaseRouter):
 
         return self._routes[method].add(path, *handlers)
 
-    def match_handlers(self, method: str, path: str):
+    def _match_handlers(self, method: str, path: str):
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 

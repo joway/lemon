@@ -1,11 +1,13 @@
 # Lemon 🍋
 
-[![PyPi Version](https://badge.fury.io/py/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/pylemon/badge/?version=latest)](http://pylemon.readthedocs.io/en/latest/?badge=latest)
+[![PyPi Version](https://img.shields.io/pypi/v/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
+[![Python Version](https://img.shields.io/pypi/pyversions/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
+[![license](https://img.shields.io/github/license/joway/lemon.svg)](https://github.com/joway/lemon/blob/master/LICENSE)
 
-Lemon is an async and lightweight restful framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
+Lemon is an async and lightweight API framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
 
 
 ## Status
@@ -88,6 +90,7 @@ app.listen()
 
 - [x] tests
 - [x] lemon router
+- [ ] keep alive timeout support
 - [ ] lemon ctx.req.form
 - [ ] documentation
 - [ ] cookies

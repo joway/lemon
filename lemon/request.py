@@ -1,12 +1,17 @@
 import json
 import socket
-from cgi import parse_header
-from urllib.parse import urlunparse, parse_qs
+from urllib.parse import urlunparse
 
 from httptools import parse_url
-from requests_toolbelt import MultipartDecoder
 
-from lemon.exception import RequestParserError
+# class RequestBodyForm:
+#     """Form object for request body when content type
+#     is 'application/x-www-form-urlencoded' or 'multipart/form-data'
+#     """
+#
+#     def __init__(self):
+#         pass
+from lemon.config import LEMON_SERVER_KEEP_ALIVE_TIMEOUT
 
 
 class Request(dict):
@@ -15,8 +20,12 @@ class Request(dict):
     Example usage:
             ctx.req
     """
-    def __init__(self, url_bytes, headers, version,
-                 method, transport, **kwargs):
+
+    def __init__(
+            self, url_bytes, headers, version,
+            method, transport, keep_alive=None,
+            keep_alive_timeout=None, **kwargs,
+    ):
         super().__init__(**kwargs)
 
         self.body = None
@@ -29,6 +38,12 @@ class Request(dict):
         self.version = version
         self.method = method.upper()
         self.transport = transport
+
+        self.keep_alive = \
+            keep_alive or \
+            self.headers.get('connection', 'close') == 'keep-alive'
+        self.keep_alive_timeout = \
+            keep_alive_timeout or LEMON_SERVER_KEEP_ALIVE_TIMEOUT
 
     @property
     def protocol(self):
@@ -59,7 +74,7 @@ class Request(dict):
 
     @property
     def json(self):
-        """Transform the body info a dict when content_type is 'application/json'
+        """Transform request body to dict when content_type is 'application/json'
         :return: dict
         """
         if self._json:
@@ -67,21 +82,23 @@ class Request(dict):
         self._json = json.loads(self.body)
         return self._json
 
-    @property
-    def form(self):
-        if self._form:
-            return self._form
-        content_type, parameters = parse_header(self.type)
-        if content_type == 'application/x-www-form-urlencoded':
-            kv_pairs = parse_qs(self.body.decode('utf-8'))
-            self._form = {p[0]: p[1] for p in kv_pairs}
-        elif content_type == 'multipart/form-data':
-            # TODO: unify form data structure
-            boundary = parameters['boundary'].encode('utf-8')
-            self._form = MultipartDecoder(self.body, self.type, 'utf-8').parts
-        else:
-            raise RequestParserError
-        return self._form
+    # @property
+    # def form(self):
+    #     """Transform request body to a dict when content_type
+    #     is 'application/x-www-form-urlencoded' and 'multipart/form-data'
+    #     """
+    #     if self._form:
+    #         return self._form
+    #     content_type, parameters = parse_header(self.type)
+    #     if content_type == MIME_TYPES.APPLICATION_X_WWW_FORM_URLENCODED:
+    #         kv_pairs = parse_qs(self.body.decode('utf-8'))
+    #         self._form = {p[0]: p[1] for p in kv_pairs}
+    #     elif content_type == MIME_TYPES.MULTIPART_FORM_DATA:
+    #         # TODO: unify form data structure
+    #         self._form = MultipartDecoder(self.body, self.type, 'utf-8').parts
+    #     else:
+    #         raise RequestParserError
+    #     return self._form
 
     @property
     def querystring(self):
@@ -92,6 +109,9 @@ class Request(dict):
 
     @property
     def query(self):
+        """
+        :return: dict
+        """
         try:
             return json.loads(self.querystring)
         except json.JSONDecoder:
@@ -99,14 +119,23 @@ class Request(dict):
 
     @property
     def search(self):
+        """
+        :return: ?k=v&...
+        """
         return '?' + self.querystring
 
     @property
     def type(self):
+        """
+        :return: dict
+        """
         return self.headers.get('content-type', 'text/plain')
 
     @property
     def url(self):
+        """
+        :return: eg: https://example.com/path/to?k=v
+        """
         return urlunparse((
             self.protocol,
             self.host,
@@ -117,6 +146,10 @@ class Request(dict):
 
     @property
     def ip(self):
+        """
+        :return: xxx.xxx.xxx.xxx
+        """
+
         if not hasattr(self, '_socket'):
             self._get_address()
         return self._ip

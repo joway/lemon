@@ -60,19 +60,23 @@ class HttpProtocol(asyncio.Protocol):
     def on_headers_complete(self):
         logger.debug('on_headers_complete')
 
-        self.ctx.req = (Request(
+        self.ctx.req = Request(
             url_bytes=self.url_bytes,
             headers=self.headers,
             version=self.parser.get_http_version(),
             method=self.parser.get_method().decode(),
             transport=self.transport,
-        ))
+            keep_alive=self.parser.should_keep_alive(),
+        )
 
     def on_body(self, body: bytes):
         self.ctx.req.recv_body(body)
 
     def on_message_complete(self):
         self.ctx.req.fin_body()
+
+        self.ctx.res.keep_alive = self.ctx.req.keep_alive
+        self.ctx.res.keep_alive_timeout = self.ctx.req.keep_alive_timeout
 
         self.loop.create_task(
             self.exec_handlers(self.handlers)
