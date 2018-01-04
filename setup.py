@@ -1,10 +1,10 @@
 from setuptools import setup
 
-DEVELOPMENT_STATUS = "alpha"
+DEVELOPMENT_STATUS = "3 - Alpha"
 
 setup(
     name='pylemon',
-    version='0.0.3',
+    version='0.0.5',
     description='An async and lightweight API framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
@@ -23,7 +23,10 @@ setup(
     ],
     classifiers=[
         "Development Status :: %s" % DEVELOPMENT_STATUS,
-        "Topic :: Framework",
+        "Framework :: AsyncIO",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Topic :: Software Development :: Libraries :: Application Frameworks",
         "Intended Audience :: Developers",
         "Intended Audience :: Information Technology",
         "Operating System :: OS Independent",
