@@ -1,4 +1,8 @@
-# Lemon 🍋 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon) [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
+# Lemon 🍋
+
+[![PyPi Version](https://badge.fury.io/py/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
+[![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
+[![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
 
 Lemon is an async and lightweight restful framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
 
@@ -10,7 +14,7 @@ ALPHA
 ## Installation
 
 ```shell
-pip install pylemon
+pip install -U pylemon
 ```
 
 ## Hello Lemon

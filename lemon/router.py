@@ -100,7 +100,9 @@ class Router:
             path = path[:-1]
 
         if method not in _HTTP_METHODS:
-            raise RouterMatchError('Method {0} is not supported'.format(method))
+            raise RouterMatchError(
+                'Method {0} is not supported'.format(method)
+            )
 
         return self._routes[method].add(path, *handlers)
 
@@ -109,14 +111,18 @@ class Router:
             path = path[:-1]
 
         if method not in _HTTP_METHODS:
-            raise RouterMatchError('Method {0} is not supported'.format(method))
+            raise RouterMatchError(
+                'Method {0} is not supported'.format(method)
+            )
 
         return self._routes[method].match(path)
 
     def use(self, methods: list, path: str, *handlers):
         for method in methods:
             if method not in _HTTP_METHODS:
-                raise RouterRegisterError('Cannot support method : {0}'.format(method))
+                raise RouterRegisterError(
+                    'Cannot support method : {0}'.format(method)
+                )
             self.register_handlers(method, path, *handlers)
 
     def get(self, path: str, *handlers):

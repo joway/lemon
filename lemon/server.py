@@ -90,7 +90,10 @@ class HttpProtocol(asyncio.Protocol):
             if len(_handler_params) == 1:
                 await _handler(ctx=self.ctx)
             elif len(_handler_params) == 2:
-                await _handler(ctx=self.ctx, nxt=partial(self.exec_handlers, handlers, handler_pos + 1))
+                await _handler(
+                    ctx=self.ctx,
+                    nxt=partial(self.exec_handlers, handlers, handler_pos + 1),
+                )
             else:
                 raise HandlerParamsError
         finally:
