@@ -13,6 +13,9 @@ LEMON_MIDDLEWARE_LIST = {
 
 class Lemon:
     def __init__(self, debug=False):
+        """Init app instance
+        :param debug: if debug == True , set log level to DEBUG , else is INFO
+        """
         self.host = config.LEMON_SERVER_HOST
         self.port = config.LEMON_SERVER_PORT
 
@@ -24,12 +27,20 @@ class Lemon:
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
     def use(self, *handlers):
+        """Register handlers into app
+
+        :param handlers: the chain of the handlers
+        """
         self.handlers.extend(handlers)
 
     def listen(self, host: str = None, port: str or int = None):
+        """Running server with binding host:port
+        """
         self.host = host or self.host
         self.port = str(port or self.port)
         serve(self, self.host, self.port, self.handlers)
 
     def stop(self):
+        """Stop app's event loop
+        """
         get_event_loop().stop()

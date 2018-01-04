@@ -1,9 +1,11 @@
 from setuptools import setup
 
+DEVELOPMENT_STATUS = "alpha"
+
 setup(
     name='pylemon',
     version='0.0.3',
-    description='An async and lightweight restful framework for python .',
+    description='An async and lightweight API framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
     author_email='joway.w@gmail.com',
@@ -18,5 +20,15 @@ setup(
         'requests>=2.18.4',
         'treelib>=1.5.1',
         'requests-toolbelt>=0.8.0',
+    ],
+    classifiers=[
+        "Development Status :: %s" % DEVELOPMENT_STATUS,
+        "Topic :: Framework",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
     ],
 )

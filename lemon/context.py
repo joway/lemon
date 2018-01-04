@@ -3,14 +3,17 @@ from lemon.response import Response
 
 
 class Context:
+    """The Context object store the current request and response .
+    Your can get all information by use ctx in your handler function .
+    """
     def __init__(self, app):
         self.app = app
-
         self.req = None
         self.res = Response()
         self.state = {}
 
     def __setattr__(self, key, value):
+        # alias
         if key == 'body':
             self.res.body = value
         if key == 'status':
@@ -27,4 +30,5 @@ class Context:
         return self.__dict__[item]
 
     def throw(self, status: int, body: str or dict = None):
+        """Throw the status and response body"""
         raise HttpError(status=status, body=body)

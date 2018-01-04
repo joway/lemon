@@ -1,16 +1,12 @@
-.. pylemon documentation master file, created by
-   sphinx-quickstart on Wed Jan  3 23:08:22 2018.
+.. kubernetes-python-client documentation master file, created by
+   sphinx-quickstart on Tue Jul  9 22:26:36 2013.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pylemon's documentation!
-===================================
+Welcome to Lemon
+========================================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
+.. include:: content.rst
 
 Indices and tables
 ==================

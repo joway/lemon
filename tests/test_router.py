@@ -94,17 +94,17 @@ class TestRouter(HttpBasicTest):
             ctx.body = {'x': 1}
 
         router = Router()
-        router.register_handlers('GET', '/res/action', middleware, handler)
+        router._register_handlers('GET', '/res/action', middleware, handler)
 
-        route = router.match_handlers('GET', '/res')
+        route = router._match_handlers('GET', '/res')
         assert route is None
 
-        route = router.match_handlers('GET', '/res/action/')
+        route = router._match_handlers('GET', '/res/action/')
         assert route is not None
         assert route.path == '/res/action'
         assert len(route.handlers) == 2
 
-        route = router.match_handlers('GET', '/res/action')
+        route = router._match_handlers('GET', '/res/action')
         assert route is not None
         assert route.path == '/res/action'
         assert len(route.handlers) == 2
@@ -114,19 +114,19 @@ class TestRouter(HttpBasicTest):
             ctx.body = {'x': 1}
 
         router = Router()
-        router.register_handlers('GET', '/res/:id/action', handler)
-        route = router.match_handlers('GET', '/res/xxx/action')
+        router._register_handlers('GET', '/res/:id/action', handler)
+        route = router._match_handlers('GET', '/res/xxx/action')
         assert route is not None
         assert route.path == '/res/:id/action'
         assert len(route.handlers) == 1
 
-        route = router.match_handlers('GET', '/res/:id/action')
+        route = router._match_handlers('GET', '/res/:id/action')
         assert route is not None
         assert route.path == '/res/:id/action'
         assert len(route.handlers) == 1
 
-        route = router.match_handlers('GET', '/re/:id/action')
+        route = router._match_handlers('GET', '/re/:id/action')
         assert route is None
 
-        route = router.match_handlers('GET', '/res/:id/actions')
+        route = router._match_handlers('GET', '/res/:id/actions')
         assert route is None
