@@ -29,7 +29,7 @@ class Request(dict):
     def __init__(
             self, url_bytes, headers, version,
             method, transport, keep_alive=None,
-            keep_alive_timeout=None, **kwargs,
+            keep_alive_timeout=None, **kwargs
     ):
         super().__init__(**kwargs)
 
