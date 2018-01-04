@@ -4,6 +4,7 @@ from lemon.log import error_logger
 
 
 async def lemon_error_handler(ctx: Context, nxt):
+    """Catch the final exception"""
     try:
         await nxt()
     except HttpError as e:

@@ -10,7 +10,11 @@ from lemon.exception import RequestParserError
 
 
 class Request(dict):
+    """The Request object store the current request's fully information
 
+    Example usage:
+            ctx.req
+    """
     def __init__(self, url_bytes, headers, version,
                  method, transport, **kwargs):
         super().__init__(**kwargs)
@@ -28,6 +32,8 @@ class Request(dict):
 
     @property
     def protocol(self):
+        """http or https
+        """
         protocol = 'http'
         if self.transport.get_extra_info('sslcontext'):
             protocol += 's'
@@ -35,18 +41,27 @@ class Request(dict):
 
     @property
     def secure(self):
+        """is using https protocol
+        """
         return self.protocol == 'https'
 
     @property
     def host(self):
+        """HTTP_HEADERS['Host']
+        """
         return self.headers.get('Host', '')
 
     @property
     def path(self):
+        """path of the request
+        """
         return self._parsed_url.path.decode('utf-8')
 
     @property
     def json(self):
+        """Transform the body info a dict when content_type is 'application/json'
+        :return: dict
+        """
         if self._json:
             return self._json
         self._json = json.loads(self.body)
