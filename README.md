@@ -3,6 +3,7 @@
 [![PyPi Version](https://badge.fury.io/py/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/pylemon/badge/?version=latest)](http://pylemon.readthedocs.io/en/latest/?badge=latest)
 
 Lemon is an async and lightweight restful framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
 
