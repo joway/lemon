@@ -1,3 +1,4 @@
+from abc import ABCMeta, abstractmethod
 from inspect import signature
 
 from treelib import Tree
@@ -85,7 +86,17 @@ class RouteTree:
         return matched_node.data
 
 
-class Router:
+class AbstractRouter(metaclass=ABCMeta):
+    @abstractmethod
+    def use(self, methods: list, path: str, *handlers):
+        raise NotImplementedError
+
+    @abstractmethod
+    def routes(self):
+        raise NotImplementedError
+
+
+class Router(AbstractRouter):
     def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
         self.slash = slash
         self._routes = {
