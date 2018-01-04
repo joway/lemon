@@ -1,7 +1,5 @@
 # Lemon 🍋
 
----
-
 [![PyPi Version](https://badge.fury.io/py/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
