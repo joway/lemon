@@ -6,8 +6,7 @@ class Context:
     """The Context object store the current request and response .
     Your can get all information by use ctx in your handler function .
     """
-    def __init__(self, app):
-        self.app = app
+    def __init__(self):
         self.req = None
         self.res = Response()
         self.state = {}

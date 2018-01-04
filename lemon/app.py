@@ -38,7 +38,7 @@ class Lemon:
         """
         self.host = host or self.host
         self.port = str(port or self.port)
-        serve(self, self.host, self.port, self.handlers)
+        serve(self.host, self.port, self.handlers)
 
     def stop(self):
         """Stop app's event loop

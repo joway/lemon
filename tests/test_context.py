@@ -5,7 +5,7 @@ from tests.base import BasicTest
 
 class TestContest(BasicTest):
     def test_set_context(self):
-        ctx = Context(None)
+        ctx = Context()
         ctx.body = {
             'a': 1,
         }
