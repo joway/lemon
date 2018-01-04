@@ -96,46 +96,7 @@ class AbstractRouter(metaclass=ABCMeta):
         raise NotImplementedError
 
 
-class Router(AbstractRouter):
-    def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
-        self.slash = slash
-        self._routes = {
-            HTTP_METHODS.GET: RouteTree(),
-            HTTP_METHODS.PUT: RouteTree(),
-            HTTP_METHODS.POST: RouteTree(),
-            HTTP_METHODS.DELETE: RouteTree(),
-        }
-
-    def register_handlers(self, method: str, path: str, *handlers):
-        if not self.slash and path[-1] == '/':
-            path = path[:-1]
-
-        if method not in _HTTP_METHODS:
-            raise RouterMatchError(
-                'Method {0} is not supported'.format(method)
-            )
-
-        return self._routes[method].add(path, *handlers)
-
-    def match_handlers(self, method: str, path: str):
-        if not self.slash and path[-1] == '/':
-            path = path[:-1]
-
-        if method not in _HTTP_METHODS:
-            raise RouterMatchError(
-                'Method {0} is not supported'.format(method)
-            )
-
-        return self._routes[method].match(path)
-
-    def use(self, methods: list, path: str, *handlers):
-        for method in methods:
-            if method not in _HTTP_METHODS:
-                raise RouterRegisterError(
-                    'Cannot support method : {0}'.format(method)
-                )
-            self.register_handlers(method, path, *handlers)
-
+class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
     def get(self, path: str, *handlers):
         return self.use([HTTP_METHODS.GET], path, *handlers)
 
@@ -155,6 +116,71 @@ class Router(AbstractRouter):
             HTTP_METHODS.POST,
             HTTP_METHODS.DELETE,
         ], path, *handlers)
+
+
+class SimpleRouter(AbstractBaseRouter):
+    def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
+        self.slash = slash
+        self._routes = {
+            HTTP_METHODS.GET: {},
+            HTTP_METHODS.PUT: {},
+            HTTP_METHODS.POST: {},
+            HTTP_METHODS.DELETE: {},
+        }
+
+    def use(self, methods: list, path: str, *handlers):
+        for method in methods:
+            if method not in _HTTP_METHODS:
+                raise RouterRegisterError(
+                    'Cannot support method : {0}'.format(method)
+                )
+            if not self.slash and path[-1] == '/':
+                path = path[:-1]
+            self._routes[method][path] = handlers
+
+    def routes(self):
+        async def _routes(ctx, nxt):
+            method = ctx.req.method
+            path = ctx.req.path
+
+            if not self.slash and path[-1] == '/':
+                path = path[:-1]
+
+            if path not in self._routes[method]:
+                ctx.status = 404
+                ctx.body = {
+                    'lemon': 'NOT FOUND'
+                }
+                return
+
+            _handlers = self._routes[method][path]
+            for _handler in _handlers:
+                _handler_params = signature(_handler).parameters
+                if len(_handler_params) == 1:
+                    await _handler(ctx)
+                else:
+                    await _handler(ctx, nxt)
+
+        return _routes
+
+
+class Router(AbstractBaseRouter):
+    def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
+        self.slash = slash
+        self._routes = {
+            HTTP_METHODS.GET: RouteTree(),
+            HTTP_METHODS.PUT: RouteTree(),
+            HTTP_METHODS.POST: RouteTree(),
+            HTTP_METHODS.DELETE: RouteTree(),
+        }
+
+    def use(self, methods: list, path: str, *handlers):
+        for method in methods:
+            if method not in _HTTP_METHODS:
+                raise RouterRegisterError(
+                    'Cannot support method : {0}'.format(method)
+                )
+            self.register_handlers(method, path, *handlers)
 
     def routes(self):
         async def _routes(ctx, nxt):
@@ -177,3 +203,25 @@ class Router(AbstractRouter):
                     await _handler(ctx, nxt)
 
         return _routes
+
+    def register_handlers(self, method: str, path: str, *handlers):
+        if not self.slash and path[-1] == '/':
+            path = path[:-1]
+
+        if method not in _HTTP_METHODS:
+            raise RouterMatchError(
+                'Method {0} is not supported'.format(method)
+            )
+
+        return self._routes[method].add(path, *handlers)
+
+    def match_handlers(self, method: str, path: str):
+        if not self.slash and path[-1] == '/':
+            path = path[:-1]
+
+        if method not in _HTTP_METHODS:
+            raise RouterMatchError(
+                'Method {0} is not supported'.format(method)
+            )
+
+        return self._routes[method].match(path)
