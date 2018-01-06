@@ -39,8 +39,7 @@ async def handler(ctx: Context):
 
 app = Lemon()
 
-app.use(middleware)
-app.use(handler)
+app.use(middleware, handler)
 
 app.listen(port=9999)
 
@@ -69,8 +68,7 @@ async def handler1(ctx: Context):
 
 
 async def handler2(ctx: Context):
-    ctx.body['ack'] = 'yeah !'
-    ctx.body['random'] = random()
+    data = ctx.res.json
 
 
 app = Lemon(debug=True)

@@ -1,6 +1,6 @@
-'''
+"""
 ==========   RuntimeError   ==========
-'''
+"""
 
 
 class BasicRuntimeError(RuntimeError):
@@ -27,9 +27,9 @@ class RequestParserError(BasicRuntimeError):
     pass
 
 
-'''
+"""
 ==========   HttpError   ==========
-'''
+"""
 
 
 class HttpError(Exception):

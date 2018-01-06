@@ -19,8 +19,7 @@ except ImportError:
 
 
 class HttpProtocol(asyncio.Protocol):
-    def __init__(self, app, loop: async_loop.Loop, handlers: list):
-        self.app = app
+    def __init__(self, loop: async_loop.Loop, handlers: list):
         self.loop = loop
         self.handlers = handlers
 
@@ -39,7 +38,7 @@ class HttpProtocol(asyncio.Protocol):
         logger.debug('data received')
 
         # init context
-        self.ctx = Context(app=self.app) if self.ctx is None else self.ctx
+        self.ctx = Context() if self.ctx is None else self.ctx
 
         # enable node.js HTTP parser
         self.parser.feed_data(data)
@@ -129,7 +128,7 @@ class HttpProtocol(asyncio.Protocol):
         self.headers = dict()
 
 
-def serve(app, host, port, handlers):
+def serve(host, port, handlers):
     logger.info('listen : http://{host}:{port}'.format(
         host=host, port=port,
     ))
@@ -140,7 +139,6 @@ def serve(app, host, port, handlers):
     protocol = HttpProtocol
     handlers = partial(
         protocol,
-        app=app,
         loop=loop,
         handlers=handlers,
     )
