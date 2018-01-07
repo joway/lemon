@@ -1,3 +1,8 @@
+import json
+
+from lemon.const import MIME_TYPES
+
+
 class Request:
     """The Request object store the current request's fully information
 
@@ -15,10 +20,58 @@ class Request:
         self.scheme = scheme
         self.path = path
         self.query_string = query_string
-        self.headers = headers
         self.body = body
         self.client = client
         self.server = server
+
+        self._headers = headers
+        self._headers_dict = None
+        self._json = None
+
+    @property
+    def headers(self):
+        if self._headers_dict:
+            return self._headers_dict
+        _headers_dict = {}
+        for h in self._headers:
+            _headers_dict[h[0].decode()] = h[1].decode()
+        self._headers_dict = _headers_dict
+        return self._headers_dict
+
+    @property
+    def protocol(self):
+        """http or https
+        """
+        return self.scheme
+
+    @property
+    def secure(self):
+        """is using https protocol
+        """
+        return self.scheme == 'https'
+
+    @property
+    def host(self):
+        """HTTP_HEADERS['Host']
+        """
+        return self.headers.get('host', '')
+
+    @property
+    def content_type(self):
+        """
+        :return: dict
+        """
+        return self.headers.get('content-type', MIME_TYPES.TEXT_PLAIN)
+
+    @property
+    def json(self):
+        """Transform request body to dict when content_type is 'application/json'
+        :return: dict
+        """
+        if self._json:
+            return self._json
+        self._json = json.loads(self.body)
+        return self._json
 
     @classmethod
     async def read_body(cls, message, channels):

@@ -27,10 +27,11 @@ class HttpClient:
             headers={'Connection': 'close'}
         )
 
-    def post(self, path, params=None):
-        return requests.get(
+    def post(self, path, data=None, json=None):
+        return requests.post(
             '{0}{1}'.format(self.base_url, path),
-            params=params,
+            data=data,
+            json=json,
             headers={'Connection': 'close'}
         )
 

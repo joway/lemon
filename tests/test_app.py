@@ -28,6 +28,22 @@ class TestApp(HttpBasicTest):
 
         client.stop_server()
 
+    def test_json_post(self):
+        async def handle(ctx: Context):
+            ctx.body = ctx.req.json
+
+        client = self.create_http_server([handle])
+        req = client.post('/', json={
+            'int': 1,
+            'str': 'xxx'
+        })
+        assert req.status_code == 200
+        data = req.json()
+        assert data['int'] == 1
+        assert data['str'] == 'xxx'
+
+        client.stop_server()
+
     def test_other_method(self):
         async def handle(ctx: Context):
             ctx.body = {
