@@ -1,19 +1,13 @@
 import pytest
 
-from lemon.context import Context
 from lemon.request import Request
 from tests.base import BasicTest
 
 
 @pytest.mark.asyncio
-class TestContext(BasicTest):
+class TestRequest(BasicTest):
     async def test_set_context(self):
-        ctx = Context()
-        ctx.body = {
-            'a': 1,
-        }
-
-        ctx.req = await Request.from_asgi_interface({
+        req = await Request.from_asgi_interface({
             'channel': 'http.request',
             'server': ('127.0.0.1', 9999),
             'client': ('127.0.0.1', 58175),
@@ -34,8 +28,9 @@ class TestContext(BasicTest):
                 [b'connection', b'keep-alive'],
             ]
         }, {})
-
-        assert ctx.body['a'] == 1
-        assert ctx.res.body['a'] == 1
-        assert id(ctx.res.body) == id(ctx.body)
-        assert id(ctx.res.status) == id(ctx.status)
+        assert isinstance(req.headers, dict)
+        assert req.headers['content-type'] == 'application/x-www-form-urlencoded'
+        assert req.host == '127.0.0.1:9999'
+        assert req.secure is False
+        assert req.protocol == 'http'
+        assert req.content_type == 'application/x-www-form-urlencoded'

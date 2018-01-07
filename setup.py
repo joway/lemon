@@ -4,7 +4,7 @@ DEVELOPMENT_STATUS = "3 - Alpha"
 
 setup(
     name='pylemon',
-    version='0.0.5',
+    version='0.0.6',
     description='An async and lightweight API framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
@@ -15,11 +15,8 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     install_requires=[
-        'uvloop>=0.9.1',
-        'httptools>=0.0.10',
-        'requests>=2.18.4',
-        'treelib>=1.5.1',
-        'requests-toolbelt>=0.8.0',
+        'uvicorn>=0.0.15',
+        'kua>=0.2',
     ],
     classifiers=[
         "Development Status :: %s" % DEVELOPMENT_STATUS,

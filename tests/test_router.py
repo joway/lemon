@@ -94,39 +94,40 @@ class TestRouter(HttpBasicTest):
             ctx.body = {'x': 1}
 
         router = Router()
-        router._register_handlers('GET', '/res/action', middleware, handler)
+        router._register_middleware_list(
+            'GET', '/res/action', middleware, handler
+        )
 
-        route = router._match_handlers('GET', '/res')
+        route = router._match_middleware_list('GET', '/res')
         assert route is None
 
-        route = router._match_handlers('GET', '/res/action/')
+        route = router._match_middleware_list('GET', '/res/action/')
         assert route is not None
-        assert route.path == '/res/action'
-        assert len(route.handlers) == 2
+        assert len(route.anything) == 2
 
-        route = router._match_handlers('GET', '/res/action')
+        route = router._match_middleware_list('GET', '/res/action')
         assert route is not None
-        assert route.path == '/res/action'
-        assert len(route.handlers) == 2
+        assert len(route.anything) == 2
 
     def test_rest_router_register(self):
         async def handler(ctx):
             ctx.body = {'x': 1}
 
         router = Router()
-        router._register_handlers('GET', '/res/:id/action', handler)
-        route = router._match_handlers('GET', '/res/xxx/action')
-        assert route is not None
-        assert route.path == '/res/:id/action'
-        assert len(route.handlers) == 1
+        router._register_middleware_list('GET', '/res/:id/action', handler)
 
-        route = router._match_handlers('GET', '/res/:id/action')
+        route = router._match_middleware_list('GET', '/res/xxx/action')
         assert route is not None
-        assert route.path == '/res/:id/action'
-        assert len(route.handlers) == 1
+        assert route.params['id'] == 'xxx'
+        assert len(route.anything) == 1
 
-        route = router._match_handlers('GET', '/re/:id/action')
+        route = router._match_middleware_list('GET', '/res/:id/action')
+        assert route is not None
+        assert route.params['id'] == ':id'
+        assert len(route.anything) == 1
+
+        route = router._match_middleware_list('GET', '/re/:id/action')
         assert route is None
 
-        route = router._match_handlers('GET', '/res/:id/actions')
+        route = router._match_middleware_list('GET', '/res/:id/actions')
         assert route is None

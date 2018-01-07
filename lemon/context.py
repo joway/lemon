@@ -6,10 +6,13 @@ class Context:
     """The Context object store the current request and response .
     Your can get all information by use ctx in your handler function .
     """
+
     def __init__(self):
         self.req = None
         self.res = Response()
+        # store middleware communication message
         self.state = {}
+        self.params = None
 
     def __setattr__(self, key, value):
         # alias

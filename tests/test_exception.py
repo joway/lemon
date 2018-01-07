@@ -1,5 +1,5 @@
 from lemon.exception import (
-    HandlerParamsError,
+    MiddlewareParamsError,
     RouterRegisterError,
     RouterMatchError,
     RequestParserError,
@@ -11,9 +11,9 @@ from tests.base import BasicTest
 class TestException(BasicTest):
     def test_serve(self):
         try:
-            raise HandlerParamsError
-        except HandlerParamsError as e:
-            assert e.msg == 'HandlerParamsError'
+            raise MiddlewareParamsError
+        except MiddlewareParamsError as e:
+            assert e.msg == 'MiddlewareParamsError'
 
         try:
             raise RouterRegisterError

@@ -11,7 +11,7 @@ class BasicRuntimeError(RuntimeError):
         return str(self.msg)
 
 
-class HandlerParamsError(BasicRuntimeError):
+class MiddlewareParamsError(BasicRuntimeError):
     pass
 
 
@@ -24,6 +24,10 @@ class RouterMatchError(BasicRuntimeError):
 
 
 class RequestParserError(BasicRuntimeError):
+    pass
+
+
+class ResponseFormatError(BasicRuntimeError):
     pass
 
 

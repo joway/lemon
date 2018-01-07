@@ -2,7 +2,7 @@ from random import random
 
 from lemon.app import Lemon
 from lemon.context import Context
-from lemon.router import Router
+from lemon.router import SimpleRouter
 
 
 async def middleware(ctx: Context, nxt):
@@ -18,16 +18,13 @@ async def handler1(ctx: Context):
 
 
 async def handler2(ctx: Context):
-    for f in ctx.req.form:
-        print(f.headers)
-        print(f.text)
     ctx.body['ack'] = 'yeah !'
-    ctx.body['random'] = random()
+    ctx.body['data'] = ctx.req.data
 
 
 app = Lemon(debug=True)
 
-router = Router()
+router = SimpleRouter()
 router.get('/handler1', middleware, handler1)
 router.post('/handler2', middleware, handler2)
 

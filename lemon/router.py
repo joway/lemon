@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from inspect import signature
 
-from treelib import Tree
+import kua
 
 from lemon.config import LEMON_ROUTER_SLASH_SENSITIVE
 from lemon.exception import RouterRegisterError, RouterMatchError
@@ -22,85 +22,13 @@ _HTTP_METHODS = [
 ]
 
 
-class Route:
-    def __init__(self, path, handlers):
-        self.path = path
-        self.handlers = handlers
-
-
-class RouteTree:
-    def __init__(self, leaves=None, handlers=None):
-        self._tree = Tree()
-        self.root = self._tree.create_node(tag='', identifier='/')
-
-    def add(self, path: str, *handlers):
-        """Register path with its handlers
-        :param path:
-        :param handlers:
-        """
-        segments = path.split('/')
-
-        if len(segments) == 0:
-            raise RouterRegisterError('Valid path : {0}'.format(path))
-
-        parent_idf = None
-        last_node = None
-        for seg in segments:
-            sep = '' if parent_idf == '/' else '/'
-            idf = '{0}{1}{2}'.format(parent_idf or '', sep, seg)
-            last_node = self._tree.get_node(idf)
-            if not last_node:
-                last_node = self._tree.create_node(
-                    tag=seg,
-                    identifier=idf,
-                    parent=parent_idf,
-                )
-            parent_idf = idf
-        last_node.data = Route(path, handlers)
-
-        return last_node
-
-    def match(self, path: str):
-        """Match path
-        :param path:
-        :return: Route object
-        """
-        # accurate hit
-        leaf = self._tree.get_node(path)
-        if leaf:
-            return leaf.data
-
-        segments = path.split('/')[1:]
-        parent_idf = self.root.identifier
-        matched_node = None
-        for i, seg in enumerate(segments):
-            nodes = self._tree.children(parent_idf)
-            _node = None
-            for node in nodes:
-                if seg == node.tag:
-                    _node = node
-                    break
-                if node.tag[0] == ':':
-                    _node = node
-            if not _node:
-                return None
-            parent_idf = _node.identifier
-            if i == len(segments) - 1:
-                matched_node = _node
-
-        if not matched_node:
-            return None
-
-        return matched_node.data
-
-
 class AbstractRouter(metaclass=ABCMeta):
     @abstractmethod
-    def use(self, methods: list, path: str, *handlers):
+    def use(self, methods: list, path: str, *middleware_list):
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
         raise NotImplementedError
 
@@ -112,45 +40,45 @@ class AbstractRouter(metaclass=ABCMeta):
 
 
 class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
-    def get(self, path: str, *handlers):
+    def get(self, path: str, *middleware_list):
         """Register GET routes
         :param path: url path
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
-        return self.use([HTTP_METHODS.GET], path, *handlers)
+        return self.use([HTTP_METHODS.GET], path, *middleware_list)
 
-    def put(self, path: str, *handlers):
+    def put(self, path: str, *middleware_list):
         """Register PUT routes
         :param path: url path
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
-        return self.use([HTTP_METHODS.PUT], path, *handlers)
+        return self.use([HTTP_METHODS.PUT], path, *middleware_list)
 
-    def post(self, path: str, *handlers):
+    def post(self, path: str, *middleware_list):
         """Register POST routes
         :param path: url path
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
-        return self.use([HTTP_METHODS.POST], path, *handlers)
+        return self.use([HTTP_METHODS.POST], path, *middleware_list)
 
-    def delete(self, path: str, *handlers):
+    def delete(self, path: str, *middleware_list):
         """Register DELETE routes
         :param path: url path
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
-        return self.use([HTTP_METHODS.DELETE], path, *handlers)
+        return self.use([HTTP_METHODS.DELETE], path, *middleware_list)
 
-    def all(self, path: str, *handlers):
+    def all(self, path: str, *middleware_list):
         """Register routes into all http methods
         :param path: url path
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
         return self.use([
             HTTP_METHODS.GET,
             HTTP_METHODS.PUT,
             HTTP_METHODS.POST,
             HTTP_METHODS.DELETE,
-        ], path, *handlers)
+        ], path, *middleware_list)
 
 
 class SimpleRouter(AbstractBaseRouter):
@@ -163,11 +91,11 @@ class SimpleRouter(AbstractBaseRouter):
             HTTP_METHODS.DELETE: {},
         }
 
-    def use(self, methods: list, path: str, *handlers):
+    def use(self, methods: list, path: str, *middleware_list):
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
         for method in methods:
             if method not in _HTTP_METHODS:
@@ -176,7 +104,7 @@ class SimpleRouter(AbstractBaseRouter):
                 )
             if not self.slash and path[-1] == '/':
                 path = path[:-1]
-            self._routes[method][path] = handlers
+            self._routes[method][path] = middleware_list
 
     def routes(self):
         """Generate async router function(ctx, nxt)
@@ -196,13 +124,13 @@ class SimpleRouter(AbstractBaseRouter):
                 }
                 return
 
-            _handlers = self._routes[method][path]
-            for _handler in _handlers:
-                _handler_params = signature(_handler).parameters
-                if len(_handler_params) == 1:
-                    await _handler(ctx)
+            middleware_list = self._routes[method][path]
+            for middleware in middleware_list:
+                middleware_params = signature(middleware).parameters
+                if len(middleware_params) == 1:
+                    await middleware(ctx)
                 else:
-                    await _handler(ctx, nxt)
+                    await middleware(ctx, nxt)
 
         return _routes
 
@@ -211,24 +139,24 @@ class Router(AbstractBaseRouter):
     def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
         self.slash = slash
         self._routes = {
-            HTTP_METHODS.GET: RouteTree(),
-            HTTP_METHODS.PUT: RouteTree(),
-            HTTP_METHODS.POST: RouteTree(),
-            HTTP_METHODS.DELETE: RouteTree(),
+            HTTP_METHODS.GET: kua.Routes(),
+            HTTP_METHODS.PUT: kua.Routes(),
+            HTTP_METHODS.POST: kua.Routes(),
+            HTTP_METHODS.DELETE: kua.Routes(),
         }
 
-    def use(self, methods: list, path: str, *handlers):
+    def use(self, methods: list, path: str, *middleware_list):
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
-        :param handlers: async function(ctx, [nxt]) list
+        :param middleware_list: async function(ctx, [nxt]) list
         """
         for method in methods:
             if method not in _HTTP_METHODS:
                 raise RouterRegisterError(
                     'Cannot support method : {0}'.format(method)
                 )
-            self._register_handlers(method, path, *handlers)
+            self._register_middleware_list(method, path, *middleware_list)
 
     def routes(self):
         """Generate async router function(ctx, nxt)
@@ -237,7 +165,7 @@ class Router(AbstractBaseRouter):
         async def _routes(ctx, nxt):
             method = ctx.req.method
             path = ctx.req.path
-            route = self._match_handlers(method=method, path=path)
+            route = self._match_middleware_list(method=method, path=path)
 
             if route is None:
                 ctx.status = 404
@@ -246,16 +174,19 @@ class Router(AbstractBaseRouter):
                 }
                 return
 
-            for _handler in route.handlers:
-                _handler_params = signature(_handler).parameters
-                if len(_handler_params) == 1:
-                    await _handler(ctx)
+            ctx.params = route.params
+            for middleware in route.anything:
+                middleware_params = signature(middleware).parameters
+                if len(middleware_params) == 1:
+                    await middleware(ctx)
                 else:
-                    await _handler(ctx, nxt)
+                    await middleware(ctx, nxt)
 
         return _routes
 
-    def _register_handlers(self, method: str, path: str, *handlers):
+    def _register_middleware_list(
+            self, method: str, path: str, *middleware_list
+    ):
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 
@@ -264,9 +195,9 @@ class Router(AbstractBaseRouter):
                 'Method {0} is not supported'.format(method)
             )
 
-        return self._routes[method].add(path, *handlers)
+        return self._routes[method].add(path, middleware_list)
 
-    def _match_handlers(self, method: str, path: str):
+    def _match_middleware_list(self, method: str, path: str):
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 
@@ -274,5 +205,7 @@ class Router(AbstractBaseRouter):
             raise RouterMatchError(
                 'Method {0} is not supported'.format(method)
             )
-
-        return self._routes[method].match(path)
+        try:
+            return self._routes[method].match(path)
+        except kua.RouteError:
+            return None

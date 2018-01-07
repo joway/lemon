@@ -89,11 +89,9 @@ app.listen()
 
 - [x] tests
 - [x] lemon router
-- [ ] keep alive timeout support
 - [ ] lemon ctx.req.form
 - [ ] documentation
 - [ ] cookies
 - [ ] cors
-- [ ] wsgi
 - [ ] benchmark
 - [ ] https
