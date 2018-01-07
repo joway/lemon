@@ -67,14 +67,17 @@ class Lemon:
         async def _wrapper(message, channels):
             """
             :param message: is an ASGI message.
-            :param channels: is a dictionary of <unicode string>:<channel interface>.
+            :param channels: is a dictionary of
+             <unicode string>:<channel interface>.
             :return: asgi application
             """
             if message['channel'] == 'http.request':
                 # init context
                 ctx = Context()
                 # prepare request
-                ctx.req = await Request.from_asgi_interface(message=message, channels=channels)
+                ctx.req = await Request.from_asgi_interface(
+                    message=message, channels=channels
+                )
                 try:
                     await exec_handlers(ctx=ctx, handlers=self.handlers)
                 except HandlerParamsError as e:
@@ -82,7 +85,8 @@ class Lemon:
                         'status': 500,
                         'headers': MIME_TYPES.APPLICATION_JSON,
                         'content': json.dumps({
-                            'lemon': 'Your application handler has wrong num of params',
+                            'lemon': 'Your application handler '
+                                     'has wrong num of params',
                         }),
                     })
                 except Exception as e:

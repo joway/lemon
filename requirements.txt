@@ -1,10 +1,12 @@
-uvloop==0.9.1
-httptools==0.0.10
-werkzeug==0.13
+# production
 uvicorn==0.0.15
+kua==0.2
+
+# dev
 pytest==3.3.1
-coveralls==1.2.0
 pytest-runner==3.0
+pytest-asyncio-0.8.0
+coveralls==1.2.0
 pycodestyle==2.3.1
 sphinx==1.6.5
 sphinx-rtd-theme==0.2.4

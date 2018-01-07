@@ -15,9 +15,8 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     install_requires=[
-        'uvloop>=0.9.1',
-        'uvicorn==0.0.15',
-        'werkzeug==0.13',
+        'uvicorn>=0.0.15',
+        'kua>=0.2',
     ],
     classifiers=[
         "Development Status :: %s" % DEVELOPMENT_STATUS,
