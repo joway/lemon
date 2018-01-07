@@ -27,7 +27,6 @@ class RequestParserError(BasicRuntimeError):
     pass
 
 
-
 class ResponseFormatError(BasicRuntimeError):
     pass
 

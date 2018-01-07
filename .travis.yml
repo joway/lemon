@@ -7,4 +7,4 @@ install:
 script:
   - coverage run --source=lemon setup.py test
   - coveralls
-  - pycodestyle --exclude docs/
+  - pycodestyle --exclude docs/ --ignore E501
