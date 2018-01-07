@@ -70,7 +70,7 @@ class Request:
         """
         if self._json:
             return self._json
-        self._json = json.loads(self.body)
+        self._json = json.loads(self.body if isinstance(self.body, str) else self.body.decode())
         return self._json
 
     @classmethod
