@@ -7,37 +7,37 @@ from inspect import signature
 from lemon import config
 from lemon.const import MIME_TYPES
 from lemon.context import Context
-from lemon.exception import HandlerParamsError
+from lemon.exception import MiddlewareParamsError
 from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
-from lemon.middleware import lemon_error_handler
+from lemon.middleware import lemon_error_middleware
 from lemon.request import Request
 from lemon.server import serve
 
 LEMON_MIDDLEWARE_LIST = {
-    lemon_error_handler,
+    lemon_error_middleware,
 }
 
 
-async def exec_handlers(ctx: Context, handlers: list, handler_pos: int = 0):
-    if handler_pos >= len(handlers):
+async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0):
+    if pos >= len(middleware_list):
         return
 
-    logger.debug('The No.{0} handler started'.format(handler_pos))
+    logger.debug('The No.{0} middleware started'.format(pos))
 
     try:
-        _handler = handlers[handler_pos]
-        _handler_params = signature(_handler).parameters
-        if len(_handler_params) == 1:
-            await _handler(ctx=ctx)
-        elif len(_handler_params) == 2:
-            await _handler(
+        middleware = middleware_list[pos]
+        middleware_params = signature(middleware).parameters
+        if len(middleware_params) == 1:
+            await middleware(ctx=ctx)
+        elif len(middleware_params) == 2:
+            await middleware(
                 ctx=ctx,
-                nxt=partial(exec_handlers, ctx, handlers, handler_pos + 1),
+                nxt=partial(exec_middleware, ctx, middleware_list, pos + 1),
             )
         else:
-            raise HandlerParamsError
+            raise MiddlewareParamsError
     finally:
-        logger.debug('The No.{0} handler finished'.format(handler_pos))
+        logger.debug('The No.{0} middleware finished'.format(pos))
 
 
 class Lemon:
@@ -48,19 +48,19 @@ class Lemon:
         self.host = config.LEMON_SERVER_HOST
         self.port = config.LEMON_SERVER_PORT
 
-        self.handlers = []
-        self.handlers.extend(LEMON_MIDDLEWARE_LIST)
+        self.middleware_list = []
+        self.middleware_list.extend(LEMON_MIDDLEWARE_LIST)
 
         # logging
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
-    def use(self, *handlers):
-        """Register handlers into app
+    def use(self, *middlewares):
+        """Register middleware into app
 
-        :param handlers: the chain of the handlers
+        :param middlewares: the chain of the middleware
         """
-        self.handlers.extend(handlers)
+        self.middleware_list.extend(middlewares)
 
     @property
     def application(self):
@@ -79,13 +79,15 @@ class Lemon:
                     message=message, channels=channels
                 )
                 try:
-                    await exec_handlers(ctx=ctx, handlers=self.handlers)
-                except HandlerParamsError as e:
+                    await exec_middleware(
+                        ctx=ctx, middleware_list=self.middleware_list
+                    )
+                except MiddlewareParamsError as e:
                     await channels['reply'].send({
                         'status': 500,
                         'headers': MIME_TYPES.APPLICATION_JSON,
                         'content': json.dumps({
-                            'lemon': 'Your application handler '
+                            'lemon': 'Your application middleware '
                                      'has wrong num of params',
                         }),
                     })
@@ -115,7 +117,7 @@ class Lemon:
         """
         self.host = host or self.host
         self.port = str(port or self.port)
-        serve(self.application, self.host, self.port, self.handlers)
+        serve(self.application, self.host, self.port)
 
     def stop(self):
         """Stop app's event loop

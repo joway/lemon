@@ -10,6 +10,7 @@ class Context:
     def __init__(self):
         self.req = None
         self.res = Response()
+        # store middleware communication message
         self.state = {}
         self.params = None
 

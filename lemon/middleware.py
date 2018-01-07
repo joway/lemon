@@ -3,7 +3,7 @@ from lemon.exception import HttpError
 from lemon.log import error_logger
 
 
-async def lemon_error_handler(ctx: Context, nxt):
+async def lemon_error_middleware(ctx: Context, nxt):
     """Catch the final exception"""
     try:
         await nxt()

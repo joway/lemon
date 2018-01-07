@@ -11,7 +11,7 @@ class BasicRuntimeError(RuntimeError):
         return str(self.msg)
 
 
-class HandlerParamsError(BasicRuntimeError):
+class MiddlewareParamsError(BasicRuntimeError):
     pass
 
 

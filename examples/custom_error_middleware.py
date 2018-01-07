@@ -14,7 +14,7 @@ async def err_middleware(ctx: Context, nxt):
         }
 
 
-async def handle(ctx: Context):
+async def middleware_exception(ctx: Context):
     raise Exception('error')
 
 
@@ -22,6 +22,6 @@ app = Lemon(debug=True)
 
 app.use(err_middleware)
 
-app.use(handle)
+app.use(middleware_exception)
 
 app.listen()
