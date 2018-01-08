@@ -73,7 +73,7 @@ async def handler1(ctx: Context):
 
 
 async def handler2(ctx: Context):
-    data = ctx.res.json
+    ctx.body = ctx.req.json
 
 
 app = Lemon(debug=True)
