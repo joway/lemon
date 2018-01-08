@@ -100,3 +100,7 @@ app.listen()
 - [ ] cors
 - [ ] benchmark
 - [ ] https
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoway%2Flemon.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoway%2Flemon?ref=badge_large)
