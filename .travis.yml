@@ -8,3 +8,5 @@ script:
   - coverage run --source=lemon setup.py test
   - coveralls
   - pycodestyle --exclude docs/ --ignore E501
+notifications:
+  webhooks: https://app.fossa.io/hooks/travisci
