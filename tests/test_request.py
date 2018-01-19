@@ -15,7 +15,7 @@ class TestRequest(BasicTest):
             'http_version': '0.0',
             'method': 'POST',
             'path': '/',
-            'query_string': b'',
+            'query_string': b'a=1&b=hello',
             'headers': [
                 [b'content-type', b'application/x-www-form-urlencoded'],
                 [b'cache-control', b'no-cache'],
@@ -34,3 +34,5 @@ class TestRequest(BasicTest):
         assert req.secure is False
         assert req.protocol == 'http'
         assert req.content_type == 'application/x-www-form-urlencoded'
+        assert req.query['a'] == '1'
+        assert req.query['b'] == 'hello'

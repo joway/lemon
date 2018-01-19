@@ -1,4 +1,5 @@
 import json
+from urllib.parse import parse_qs
 
 from lemon.const import MIME_TYPES
 
@@ -24,9 +25,11 @@ class Request:
         self.client = client
         self.server = server
 
+        # for cache
         self._headers = headers
         self._headers_dict = None
         self._json = None
+        self._query = None
 
     @property
     def headers(self):
@@ -64,6 +67,13 @@ class Request:
         return self.headers.get('content-type', MIME_TYPES.TEXT_PLAIN)
 
     @property
+    def query(self):
+        if self._query is None:
+            _q = parse_qs(self.query_string)
+            self._query = {k: _q[k][0] for k in _q}
+        return self._query
+
+    @property
     def json(self):
         """Transform request body to dict when content_type is 'application/json'
         :return: dict
@@ -97,7 +107,7 @@ class Request:
             method=message['method'],
             scheme=message['scheme'],
             path=message['path'],
-            query_string=message['query_string'],
+            query_string=message['query_string'].decode('utf-8'),
             headers=message['headers'],
             body=body,
             client=message['client'],
