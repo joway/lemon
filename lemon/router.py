@@ -1,9 +1,10 @@
+import typing
 from abc import ABCMeta, abstractmethod
 from inspect import signature
 
 import kua
 
-from lemon.config import LEMON_ROUTER_SLASH_SENSITIVE
+from lemon.config import settings
 from lemon.exception import RouterRegisterError, RouterMatchError
 
 
@@ -24,7 +25,7 @@ _HTTP_METHODS = [
 
 class AbstractRouter(metaclass=ABCMeta):
     @abstractmethod
-    def use(self, methods: list, path: str, *middleware_list):
+    def use(self, methods: list, path: str, *middleware_list) -> None:
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
@@ -33,42 +34,42 @@ class AbstractRouter(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def routes(self):
+    def routes(self) -> None:
         """Return async function(ctx, [nxt])
         """
         raise NotImplementedError
 
 
 class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
-    def get(self, path: str, *middleware_list):
+    def get(self, path: str, *middleware_list) -> None:
         """Register GET routes
         :param path: url path
         :param middleware_list: async function(ctx, [nxt]) list
         """
         return self.use([HTTP_METHODS.GET], path, *middleware_list)
 
-    def put(self, path: str, *middleware_list):
+    def put(self, path: str, *middleware_list) -> None:
         """Register PUT routes
         :param path: url path
         :param middleware_list: async function(ctx, [nxt]) list
         """
         return self.use([HTTP_METHODS.PUT], path, *middleware_list)
 
-    def post(self, path: str, *middleware_list):
+    def post(self, path: str, *middleware_list) -> None:
         """Register POST routes
         :param path: url path
         :param middleware_list: async function(ctx, [nxt]) list
         """
         return self.use([HTTP_METHODS.POST], path, *middleware_list)
 
-    def delete(self, path: str, *middleware_list):
+    def delete(self, path: str, *middleware_list) -> None:
         """Register DELETE routes
         :param path: url path
         :param middleware_list: async function(ctx, [nxt]) list
         """
         return self.use([HTTP_METHODS.DELETE], path, *middleware_list)
 
-    def all(self, path: str, *middleware_list):
+    def all(self, path: str, *middleware_list) -> None:
         """Register routes into all http methods
         :param path: url path
         :param middleware_list: async function(ctx, [nxt]) list
@@ -82,7 +83,7 @@ class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
 
 
 class SimpleRouter(AbstractBaseRouter):
-    def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
+    def __init__(self, slash=settings.LEMON_ROUTER_SLASH_SENSITIVE) -> None:
         self.slash = slash
         self._routes = {
             HTTP_METHODS.GET: {},
@@ -91,7 +92,7 @@ class SimpleRouter(AbstractBaseRouter):
             HTTP_METHODS.DELETE: {},
         }
 
-    def use(self, methods: list, path: str, *middleware_list):
+    def use(self, methods: list, path: str, *middleware_list) -> None:
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
@@ -106,11 +107,11 @@ class SimpleRouter(AbstractBaseRouter):
                 path = path[:-1]
             self._routes[method][path] = middleware_list
 
-    def routes(self):
+    def routes(self) -> typing.Callable:
         """Generate async router function(ctx, nxt)
         """
 
-        async def _routes(ctx, nxt):
+        async def _routes(ctx, nxt) -> None:
             method = ctx.req.method
             path = ctx.req.path
 
@@ -136,7 +137,7 @@ class SimpleRouter(AbstractBaseRouter):
 
 
 class Router(AbstractBaseRouter):
-    def __init__(self, slash=LEMON_ROUTER_SLASH_SENSITIVE):
+    def __init__(self, slash=settings.LEMON_ROUTER_SLASH_SENSITIVE) -> None:
         self.slash = slash
         self._routes = {
             HTTP_METHODS.GET: kua.Routes(),
@@ -145,7 +146,7 @@ class Router(AbstractBaseRouter):
             HTTP_METHODS.DELETE: kua.Routes(),
         }
 
-    def use(self, methods: list, path: str, *middleware_list):
+    def use(self, methods: list, path: str, *middleware_list) -> None:
         """Register routes
         :param methods: GET|PUT|POST|DELETE
         :param path: string
@@ -158,11 +159,11 @@ class Router(AbstractBaseRouter):
                 )
             self._register_middleware_list(method, path, *middleware_list)
 
-    def routes(self):
+    def routes(self) -> typing.Callable:
         """Generate async router function(ctx, nxt)
         """
 
-        async def _routes(ctx, nxt):
+        async def _routes(ctx, nxt) -> None:
             method = ctx.req.method
             path = ctx.req.path
             route = self._match_middleware_list(method=method, path=path)
@@ -186,7 +187,7 @@ class Router(AbstractBaseRouter):
 
     def _register_middleware_list(
             self, method: str, path: str, *middleware_list
-    ):
+    ) -> None:
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 
@@ -197,7 +198,7 @@ class Router(AbstractBaseRouter):
 
         return self._routes[method].add(path, middleware_list)
 
-    def _match_middleware_list(self, method: str, path: str):
+    def _match_middleware_list(self, method: str, path: str) -> typing.Any:
         if not self.slash and path[-1] == '/':
             path = path[:-1]
 

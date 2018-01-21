@@ -95,6 +95,8 @@ app.listen()
 
 - [x] tests
 - [x] lemon router
+- [ ] add typing
+- [ ] implement a Trie router
 - [ ] lemon ctx.req.form
 - [ ] documentation
 - [ ] cookies

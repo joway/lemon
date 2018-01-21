@@ -19,7 +19,7 @@ async def handler1(ctx: Context):
 
 async def handler2(ctx: Context):
     ctx.body['ack'] = 'yeah !'
-    ctx.body['data'] = ctx.req.data
+    ctx.body['data'] = ctx.req.json
 
 
 app = Lemon(debug=True)

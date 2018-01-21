@@ -1,10 +1,11 @@
 import json
 import logging.config
+import typing
 from asyncio import get_event_loop
 from functools import partial
 from inspect import signature
 
-from lemon import config
+from lemon.config import settings
 from lemon.const import MIME_TYPES
 from lemon.context import Context
 from lemon.exception import MiddlewareParamsError
@@ -18,19 +19,18 @@ LEMON_MIDDLEWARE_LIST = {
 }
 
 
-async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0):
+async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
     if pos >= len(middleware_list):
         return
-
     logger.debug('The No.{0} middleware started'.format(pos))
 
     try:
         middleware = middleware_list[pos]
         middleware_params = signature(middleware).parameters
         if len(middleware_params) == 1:
-            await middleware(ctx=ctx)
+            return await middleware(ctx=ctx)
         elif len(middleware_params) == 2:
-            await middleware(
+            return await middleware(
                 ctx=ctx,
                 nxt=partial(exec_middleware, ctx, middleware_list, pos + 1),
             )
@@ -41,12 +41,12 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0):
 
 
 class Lemon:
-    def __init__(self, debug=False):
+    def __init__(self, config: typing.Dict = None, debug=False) -> None:
         """Init app instance
         :param debug: if debug == True , set log level to DEBUG , else is INFO
         """
-        self.host = config.LEMON_SERVER_HOST
-        self.port = config.LEMON_SERVER_PORT
+        self.config = config
+        settings.set_config(config=config)
 
         self.middleware_list = []
         self.middleware_list.extend(LEMON_MIDDLEWARE_LIST)
@@ -55,7 +55,7 @@ class Lemon:
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
-    def use(self, *middlewares):
+    def use(self, *middlewares) -> None:
         """Register middleware into app
 
         :param middlewares: the chain of the middleware
@@ -63,8 +63,8 @@ class Lemon:
         self.middleware_list.extend(middlewares)
 
     @property
-    def application(self):
-        async def _wrapper(message, channels):
+    def application(self) -> typing.Callable:
+        async def _wrapper(message: typing.Dict, channels: typing.Dict) -> None:
             """
             :param message: is an ASGI message.
             :param channels: is a dictionary of
@@ -112,14 +112,14 @@ class Lemon:
 
         return _wrapper
 
-    def listen(self, host: str = None, port: str or int = None):
+    def listen(self, host: str = None, port: str or int = None) -> None:
         """Running server with binding host:port
         """
-        self.host = host or self.host
-        self.port = str(port or self.port)
-        serve(self.application, self.host, self.port)
+        _host = host or settings.LEMON_SERVER_HOST
+        _port = port or settings.LEMON_SERVER_PORT
+        serve(self.application, _host, _port)
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop app's event loop
         """
         get_event_loop().stop()

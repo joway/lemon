@@ -2,36 +2,41 @@ from lemon.exception import (
     MiddlewareParamsError,
     RouterRegisterError,
     RouterMatchError,
-    RequestParserError,
-    HttpError
+    RequestBodyParserError,
+    GeneralException
 )
 from tests.base import BasicTest
 
 
 class TestException(BasicTest):
-    def test_serve(self):
+    def test_exception(self):
+        try:
+            raise GeneralException(status=400, body='err')
+        except GeneralException as e:
+            assert e.status == 400
+            assert e.body == 'err'
+
+        try:
+            raise MiddlewareParamsError
+        except GeneralException as e:
+            assert e.status == 500
+
         try:
             raise MiddlewareParamsError
         except MiddlewareParamsError as e:
-            assert e.msg == 'MiddlewareParamsError'
+            assert e.status == 500
 
         try:
             raise RouterRegisterError
         except RouterRegisterError as e:
-            assert e.msg == 'RouterRegisterError'
+            assert e.status == 500
 
         try:
             raise RouterMatchError
         except RouterMatchError as e:
-            assert e.msg == 'RouterMatchError'
+            assert e.status == 500
 
         try:
-            raise RequestParserError
-        except RequestParserError as e:
-            assert e.msg == 'RequestParserError'
-
-        try:
-            raise HttpError(status=400, body='err')
-        except HttpError as e:
+            raise RequestBodyParserError
+        except RequestBodyParserError as e:
             assert e.status == 400
-            assert e.body == 'err'

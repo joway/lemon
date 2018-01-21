@@ -54,6 +54,7 @@ class HttpClient:
         process.daemon = True
         process.start()
         self.process = process
+        # wait for server started
         time.sleep(0.1)
 
     def stop_server(self):

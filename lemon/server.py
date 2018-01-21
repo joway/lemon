@@ -1,3 +1,5 @@
+import typing
+
 import uvicorn
 
 from lemon.log import (
@@ -5,7 +7,7 @@ from lemon.log import (
 )
 
 
-def serve(app, host, port):
+def serve(app: typing.Callable, host: typing.Text, port: typing.Text or int) -> None:
     logger.info('listen : http://{host}:{port}'.format(
         host=host, port=port,
     ))
