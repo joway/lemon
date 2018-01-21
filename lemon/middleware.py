@@ -5,7 +5,7 @@ from lemon.exception import GeneralException
 from lemon.log import error_logger
 
 
-async def lemon_error_middleware(ctx: Context, nxt) -> typing.Any:
+async def lemon_error_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any:
     """Catch the final exception"""
     try:
         return await nxt()

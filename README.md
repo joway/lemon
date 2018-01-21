@@ -97,10 +97,10 @@ app.listen()
 - [x] tests
 - [x] lemon router
 - [x] add typing
-- [ ] implement a Trie router
 - [x] lemon ctx.req.form
-- [ ] documentation
+- [ ] implement a Trie router
 - [ ] cookies
 - [ ] cors
+- [ ] documentation
 - [ ] benchmark
-- [ ] https
+- [ ] websocket

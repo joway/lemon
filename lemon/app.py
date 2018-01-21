@@ -119,7 +119,8 @@ class Lemon:
         _port = port or settings.LEMON_SERVER_PORT
         serve(self.application, _host, _port)
 
-    def stop(self) -> None:
+    @staticmethod
+    def stop() -> None:
         """Stop app's event loop
         """
         get_event_loop().stop()

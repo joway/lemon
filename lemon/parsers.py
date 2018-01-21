@@ -8,6 +8,7 @@ from werkzeug.http import parse_options_header
 from werkzeug.urls import url_decode
 
 import lemon.exception as exception
+from lemon.const import MIME_TYPES
 
 
 def get_mimetype_and_options(headers: typing.Dict) -> typing.Tuple[str, dict]:
@@ -60,9 +61,9 @@ def multi_part_parser(body: bytes, headers: typing.Dict = None) -> ImmutableMult
 
 
 DEFAULT_PARSERS_MAPPING = {
-    'application/json': json_parser,
-    'application/x-www-form-urlencoded': url_encoded_parser,
-    'multipart/form-data': multi_part_parser,
+    MIME_TYPES.APPLICATION_JSON: json_parser,
+    MIME_TYPES.APPLICATION_X_WWW_FORM_URLENCODED: url_encoded_parser,
+    MIME_TYPES.MULTIPART_FORM_DATA: multi_part_parser,
 }
 
 

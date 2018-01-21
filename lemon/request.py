@@ -15,9 +15,17 @@ class Request:
     """
 
     def __init__(
-            self, http_version, method, scheme,
-            path, query_string, headers, body,
-            data: ImmutableMultiDict or None, client, server,
+            self,
+            http_version: '1.1',
+            method: 'GET',
+            scheme: 'https',
+            path: '/',
+            query_string: b'?k=v',
+            headers: typing.Dict,
+            body: bytes,
+            data: ImmutableMultiDict or None,
+            client: ('1.1.1.1', '56938'),
+            server: ('127.0.0.1', '9999'),
     ) -> None:
         self.http_version = http_version
         self.method = method.upper()
