@@ -33,6 +33,7 @@ class Context:
             return self.res.status
         return self.__dict__[item]
 
-    def throw(self, status: int, body: str or dict = None) -> None:
+    @staticmethod
+    def throw(status: int, body: str or dict = None) -> None:
         """Throw the status and response body"""
         raise GeneralException(status=status, body=body)

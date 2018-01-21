@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f7f2ffd3c5f74732bb445e4cde9216a8)](https://www.codacy.com/app/joway/lemon?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=joway/lemon&amp;utm_campaign=Badge_Grade)
 [![Documentation Status](https://readthedocs.org/projects/pylemon/badge/?version=latest)](http://pylemon.readthedocs.io/en/latest/?badge=latest)
 [![PyPi Version](https://img.shields.io/pypi/v/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
 [![Python Version](https://img.shields.io/pypi/pyversions/pylemon.svg)](https://pypi.python.org/pypi/pylemon)
@@ -95,9 +96,9 @@ app.listen()
 
 - [x] tests
 - [x] lemon router
-- [ ] add typing
+- [x] add typing
 - [ ] implement a Trie router
-- [ ] lemon ctx.req.form
+- [x] lemon ctx.req.form
 - [ ] documentation
 - [ ] cookies
 - [ ] cors
