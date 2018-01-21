@@ -1,5 +1,6 @@
 # Lemon 🍋
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/39bb926afb0144ef8842b8a1b94abc50)](https://www.codacy.com/app/joway/lemon?utm_source=github.com&utm_medium=referral&utm_content=joway/lemon&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/pylemon/badge/?version=latest)](http://pylemon.readthedocs.io/en/latest/?badge=latest)
