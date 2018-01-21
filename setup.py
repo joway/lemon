@@ -17,6 +17,7 @@ setup(
     install_requires=[
         'uvicorn>=0.0.15',
         'kua>=0.2',
+        'werkzeug>=0.14.1',
     ],
     classifiers=[
         "Development Status :: %s" % DEVELOPMENT_STATUS,

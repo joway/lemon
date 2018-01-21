@@ -27,11 +27,12 @@ class HttpClient:
             headers={'Connection': 'close'}
         )
 
-    def post(self, path, data=None, json=None):
+    def post(self, path, data=None, json=None, files=None):
         return requests.post(
             '{0}{1}'.format(self.base_url, path),
             data=data,
             json=json,
+            files=files,
             headers={'Connection': 'close'}
         )
 
@@ -54,6 +55,7 @@ class HttpClient:
         process.daemon = True
         process.start()
         self.process = process
+        # wait for server started
         time.sleep(0.1)
 
     def stop_server(self):

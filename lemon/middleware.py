@@ -1,13 +1,15 @@
+import typing
+
 from lemon.context import Context
-from lemon.exception import HttpError
+from lemon.exception import GeneralException
 from lemon.log import error_logger
 
 
-async def lemon_error_middleware(ctx: Context, nxt):
+async def lemon_error_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any:
     """Catch the final exception"""
     try:
-        await nxt()
-    except HttpError as e:
+        return await nxt()
+    except GeneralException as e:
         ctx.body = e.body
         ctx.status = e.status
     except Exception as e:
