@@ -4,7 +4,7 @@ DEVELOPMENT_STATUS = "3 - Alpha"
 
 setup(
     name='pylemon',
-    version='0.0.7',
+    version='0.0.8',
     description='An async and lightweight API framework for python .',
     url='https://github.com/joway/lemon',
     author='Joway Wang',
