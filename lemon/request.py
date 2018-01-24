@@ -2,6 +2,7 @@ import typing
 from urllib.parse import parse_qs
 
 from werkzeug.datastructures import ImmutableMultiDict
+from werkzeug.http import parse_cookie
 
 from lemon.const import MIME_TYPES
 from lemon.parsers import parse_http_body
@@ -83,6 +84,10 @@ class Request:
         :return: dict
         """
         return self.data.to_dict(flat=True) if self.data else None
+
+    @property
+    def cookies(self) -> typing.Dict:
+        return parse_cookie(self.headers.get('cookie'))
 
     @classmethod
     async def read_body(cls, message, channels) -> bytes:

@@ -1,5 +1,6 @@
 import pytest
 
+from lemon.context import Context
 from lemon.request import Request
 from tests.base import BasicTest
 
@@ -36,3 +37,18 @@ class TestRequest(BasicTest):
         assert req.content_type == 'application/x-www-form-urlencoded'
         assert req.query['a'] == '1'
         assert req.query['b'] == 'hello'
+
+    def test_cookies(self):
+        async def handle(ctx: Context):
+            print(ctx.req.cookies)
+            ctx.body = {
+                'ack': 'yeah !',
+            }
+
+        client = self.create_http_server([handle])
+        req =   client.get('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'yeah !'
+
+        client.stop_server()
