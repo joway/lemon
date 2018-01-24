@@ -5,21 +5,15 @@ from inspect import signature
 import kua
 
 from lemon.config import settings
+from lemon.const import HTTP_METHODS
 from lemon.exception import RouterRegisterError, RouterMatchError
-
-
-class HTTP_METHODS:
-    GET = 'GET'
-    PUT = 'PUT'
-    POST = 'POST'
-    DELETE = 'DELETE'
-
 
 _HTTP_METHODS = [
     HTTP_METHODS.GET,
     HTTP_METHODS.PUT,
     HTTP_METHODS.POST,
     HTTP_METHODS.DELETE,
+    HTTP_METHODS.OPTIONS,
 ]
 
 

@@ -14,9 +14,11 @@ from lemon.middleware import lemon_error_middleware
 from lemon.request import Request
 from lemon.server import serve
 
-LEMON_MIDDLEWARE_LIST = {
+LEMON_PRE_PROCESS_MIDDLEWARE = []
+
+LEMON_POST_PROCESS_MIDDLEWARE = [
     lemon_error_middleware,
-}
+]
 
 
 async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
@@ -49,7 +51,6 @@ class Lemon:
         settings.set_config(config=config)
 
         self.middleware_list = []
-        self.middleware_list.extend(LEMON_MIDDLEWARE_LIST)
 
         # logging
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
@@ -78,9 +79,14 @@ class Lemon:
                 ctx.req = await Request.from_asgi_interface(
                     message=message, channels=channels
                 )
+                middleware_chain = \
+                    LEMON_PRE_PROCESS_MIDDLEWARE \
+                    + self.middleware_list \
+                    + LEMON_POST_PROCESS_MIDDLEWARE
+
                 try:
                     await exec_middleware(
-                        ctx=ctx, middleware_list=self.middleware_list
+                        ctx=ctx, middleware_list=middleware_chain
                     )
                 except MiddlewareParamsError as e:
                     await channels['reply'].send({

@@ -46,7 +46,7 @@ class TestRequest(BasicTest):
             }
 
         client = self.create_http_server([handle])
-        req =   client.get('/')
+        req = client.get('/')
         data = req.json()
         assert req.status_code == 200
         assert data['ack'] == 'yeah !'
