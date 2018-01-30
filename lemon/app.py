@@ -29,10 +29,16 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> 
     """
     if pos >= len(middleware_list):
         return
-    logger.debug('The No.{0} middleware started'.format(pos))
+
+    middleware = middleware_list[pos]
+    logger.debug(
+        'The No.{0} middleware : {1} started'.format(
+            pos,
+            middleware.__name__,
+        )
+    )
 
     try:
-        middleware = middleware_list[pos]
         middleware_params = signature(middleware).parameters
         if len(middleware_params) == 1:
             return await middleware(ctx=ctx)
@@ -44,7 +50,12 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> 
         else:
             raise MiddlewareParamsError
     finally:
-        logger.debug('The No.{0} middleware finished'.format(pos))
+        logger.debug(
+            'The No.{0} middleware : {1} finished'.format(
+                pos,
+                middleware.__name__,
+            )
+        )
 
 
 class Lemon:
