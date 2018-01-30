@@ -13,7 +13,7 @@ class Response:
         self.status = status
         self.headers = headers if headers else []
         self.content_type = content_type
-        self.body = body
+        self.body = body or ''
 
     @property
     def message(self) -> typing.Dict:

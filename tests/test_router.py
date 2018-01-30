@@ -1,9 +1,12 @@
+import pytest
+
 from lemon.router import Router, SimpleRouter
-from tests.base import HttpBasicTest
+from tests import BasicHttpTestCase
 
 
-class TestRouter(HttpBasicTest):
-    def test_sample_router(self):
+@pytest.mark.asyncio
+class TestRouter(BasicHttpTestCase):
+    async def test_sample_router(self):
         async def middleware(ctx, nxt):
             ctx.body = {'m': 'mid'}
             await nxt()
@@ -18,33 +21,31 @@ class TestRouter(HttpBasicTest):
         router.get('/app/handler1', middleware, handler1)
         router.get('/app/handler2', middleware, handler2)
 
-        client = self.create_http_server(handlers=[router.routes()])
-        req = client.get('/app/handler1')
+        self.app.use(router.routes())
+        req = await self.get('/app/handler1')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 1
 
-        req = client.get('/app/handler2')
+        req = await self.get('/app/handler2')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 2
 
-        req = client.get('/app/handler2/')
+        req = await self.get('/app/handler2/')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 2
 
-        req = client.get('/app/xxx/')
+        req = await self.get('/app/xxx/')
         data = req.json()
         assert req.status_code == 404
         assert data['lemon'] == 'NOT FOUND'
 
-        client.stop_server()
-
-    def test_router_example(self):
+    async def test_router_example(self):
         async def middleware(ctx, nxt):
             ctx.body = {'m': 'mid'}
             await nxt()
@@ -59,33 +60,31 @@ class TestRouter(HttpBasicTest):
         router.get('/app/handler1', middleware, handler1)
         router.get('/app/handler2', middleware, handler2)
 
-        client = self.create_http_server(handlers=[router.routes()])
-        req = client.get('/app/handler1')
+        self.app.use(router.routes())
+        req = await self.get('/app/handler1')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 1
 
-        req = client.get('/app/handler2')
+        req = await self.get('/app/handler2')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 2
 
-        req = client.get('/app/handler2/')
+        req = await self.get('/app/handler2/')
         data = req.json()
         assert req.status_code == 200
         assert data['m'] == 'mid'
         assert data['app'] == 2
 
-        req = client.get('/app/xxx/')
+        req = await self.get('/app/xxx/')
         data = req.json()
         assert req.status_code == 404
         assert data['lemon'] == 'NOT FOUND'
 
-        client.stop_server()
-
-    def test_router_register(self):
+    async def test_router_register(self):
         async def middleware(ctx, nxt):
             ctx.body = {'m': 2}
             await nxt
@@ -109,7 +108,7 @@ class TestRouter(HttpBasicTest):
         assert route is not None
         assert len(route.anything) == 2
 
-    def test_rest_router_register(self):
+    async def test_rest_router_register(self):
         async def handler(ctx):
             ctx.body = {'x': 1}
 

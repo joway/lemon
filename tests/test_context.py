@@ -2,11 +2,11 @@ import pytest
 
 from lemon.context import Context
 from lemon.request import Request
-from tests.base import BasicTest
+from tests import BasicHttpTestCase
 
 
 @pytest.mark.asyncio
-class TestContext(BasicTest):
+class TestContext(BasicHttpTestCase):
     async def test_set_context(self):
         ctx = Context()
         ctx.body = {

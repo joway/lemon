@@ -1,3 +1,4 @@
+import traceback
 import typing
 
 from lemon.context import Context
@@ -13,6 +14,8 @@ async def lemon_error_middleware(ctx: Context, nxt: typing.Callable) -> typing.A
         ctx.body = e.body
         ctx.status = e.status
     except Exception as e:
-        error_logger.error(e)
+        error_logger.error(traceback.print_exc())
         ctx.status = 500
-        ctx.body = ctx.body or 'INTERNAL ERROR'
+        ctx.body = ctx.body or {
+            'lemon': 'INTERNAL ERROR',
+        }

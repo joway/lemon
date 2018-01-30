@@ -1,8 +1,8 @@
 from lemon.config import settings
-from tests.base import HttpBasicTest
+from tests import BasicHttpTestCase
 
 
-class TestConfig(HttpBasicTest):
+class TestConfig(BasicHttpTestCase):
     def test_config(self):
         local_config = {
             'LEMON_SERVER_HOST': '1.2.3.4',
