@@ -1,10 +1,8 @@
-import typing
-
 from lemon.exception import LemonConfigKeyError
 
 
 class LemonConfig:
-    def __init__(self, default_config: typing.Dict = None, config: typing.Dict = None):
+    def __init__(self, default_config: dict = None, config: dict = None) -> None:
         """
         :param default_config: default app config
         :param config: app config
@@ -12,18 +10,18 @@ class LemonConfig:
         self._default_config = default_config or {}
         self._config = config or {}
 
-    def set_config(self, config: typing.Dict):
+    def set_config(self, config: dict):
         """
         :param config: app config
         """
         self._config = config or {}
 
-    def __getattr__(self, key: typing.Text):
+    def __getattr__(self, key: str):
         if key.startswith('_'):
             return self.__getattribute__(key)
         return self.__getitem__(key)
 
-    def __getitem__(self, key: typing.Text):
+    def __getitem__(self, key: str):
         try:
             return self._config[key]
         except KeyError:

@@ -14,11 +14,11 @@ from lemon.middleware import lemon_error_middleware
 from lemon.request import Request
 from lemon.server import serve
 
-LEMON_PRE_PROCESS_MIDDLEWARE = [
+LEMON_PRE_PROCESS_MIDDLEWARE: list = [
     lemon_error_middleware,
 ]
 
-LEMON_POST_PROCESS_MIDDLEWARE = []
+LEMON_POST_PROCESS_MIDDLEWARE: list = []
 
 
 async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
@@ -59,7 +59,7 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> 
 
 
 class Lemon:
-    def __init__(self, config: typing.Dict = None, debug=False) -> None:
+    def __init__(self, config: dict = None, debug=False) -> None:
         """Init app instance
         :param config: app config
         :param debug: if debug == True , set log level to DEBUG , else is INFO
@@ -67,7 +67,7 @@ class Lemon:
         self.config = config
         settings.set_config(config=config)
 
-        self.middleware_list = []
+        self.middleware_list: list = []
 
         # logging
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
@@ -81,7 +81,7 @@ class Lemon:
 
     @property
     def application(self) -> typing.Callable:
-        async def _wrapper(message: typing.Dict, channels: typing.Dict) -> typing.Any:
+        async def _wrapper(message: dict, channels: dict) -> typing.Any:
             """
             :param message: is an ASGI message.
             :param channels: is a dictionary of
@@ -123,11 +123,10 @@ class Lemon:
 
         return _wrapper
 
-    def listen(self, host: str = None, port: str or int = None) -> None:
+    def listen(self, host: str = None, port: typing.Union[int, str] = None) -> None:
         """Running server with binding host:port
-        :param host: eg: "127.0.0.1"
-        :param port: eg: 9999
-        :return:
+        :param host: "127.0.0.1"
+        :param port: 9999
         """
         _host = host or settings.LEMON_SERVER_HOST
         _port = port or settings.LEMON_SERVER_PORT

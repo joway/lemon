@@ -14,8 +14,8 @@ class Context:
         self.req: Request = None
         self.res: Response = Response()
         # store middleware communication message
-        self.state: typing.Dict = {}
-        self.params: typing.Dict = None
+        self.state: dict = {}
+        self.params: dict = None
 
     def __setattr__(self, key, value) -> None:
         # alias
@@ -35,6 +35,6 @@ class Context:
         return self.__dict__[item]
 
     @staticmethod
-    def throw(status: int, body: str or dict = None) -> None:
+    def throw(status: int, body: typing.Union[str, dict] = None) -> None:
         """Throw the status and response body"""
         raise GeneralException(status=status, body=body)

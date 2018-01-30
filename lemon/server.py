@@ -7,7 +7,7 @@ from lemon.log import (
 )
 
 
-def serve(app: typing.Callable, host: typing.Text, port: typing.Text or int) -> None:
+def serve(app: typing.Callable, host: str, port: typing.Union[int, str]) -> None:
     """Run server
     :param app: app function
     :param host: eg: "0.0.0.0"

@@ -11,14 +11,14 @@ import lemon.exception as exception
 from lemon.const import MIME_TYPES
 
 
-def get_mimetype_and_options(headers: typing.Dict) -> typing.Tuple[str, dict]:
+def get_mimetype_and_options(headers: dict) -> typing.Tuple[str, dict]:
     content_type = headers.get('content-type')
     if content_type:
         return parse_options_header(content_type)
     return '', {}
 
 
-def get_content_length(headers: typing.Dict) -> typing.Optional[int]:
+def get_content_length(headers: dict) -> typing.Optional[int]:
     if headers is None:
         raise exception.RequestHeadersParserError
     content_length = headers.get('content-length')
@@ -43,11 +43,11 @@ def json_parser(body: bytes, *args) -> ImmutableMultiDict:
         })
 
 
-def url_encoded_parser(body: bytes, *args) -> typing.Dict:
+def url_encoded_parser(body: bytes, *args) -> dict:
     return url_decode(body, cls=ImmutableMultiDict)
 
 
-def multi_part_parser(body: bytes, headers: typing.Dict = None) -> ImmutableMultiDict:
+def multi_part_parser(body: bytes, headers: dict = None) -> ImmutableMultiDict:
     mimetype, options = get_mimetype_and_options(headers)
     content_length = get_content_length(headers)
     parser = FormDataParser()
@@ -67,7 +67,7 @@ DEFAULT_PARSERS_MAPPING = {
 }
 
 
-def parse_http_body(headers: typing.Dict, body: bytes) -> ImmutableMultiDict or None:
+def parse_http_body(headers: dict, body: bytes) -> typing.Optional[ImmutableMultiDict]:
     content_type, _ = get_mimetype_and_options(headers=headers)
     for parser_mimetype in DEFAULT_PARSERS_MAPPING:
         if parser_mimetype == content_type:

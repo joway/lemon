@@ -28,7 +28,7 @@ class AbstractRouter(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def routes(self) -> None:
+    def routes(self) -> typing.Callable:
         """Return async function(ctx, [nxt])
         """
         raise NotImplementedError
@@ -79,7 +79,7 @@ class AbstractBaseRouter(AbstractRouter, metaclass=ABCMeta):
 class SimpleRouter(AbstractBaseRouter):
     def __init__(self, slash=settings.LEMON_ROUTER_SLASH_SENSITIVE) -> None:
         self.slash = slash
-        self._routes = {
+        self._routes: dict = {
             HTTP_METHODS.GET: {},
             HTTP_METHODS.PUT: {},
             HTTP_METHODS.POST: {},

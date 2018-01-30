@@ -17,7 +17,7 @@ class Response:
 
     @property
     def message(self) -> dict:
-        content = ''
+        content = b''
         if isinstance(self.body, dict):
             self.content_type = MIME_TYPES.APPLICATION_JSON
             content = json.dumps(self.body).encode()

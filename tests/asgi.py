@@ -13,7 +13,7 @@ class MockReplyChannel:
 
 
 class MockBodyChannel:
-    def __init__(self, mock_data: typing.Dict = None, mock_body: bytes = None):
+    def __init__(self, mock_data: dict = None, mock_body: bytes = None):
         if mock_body:
             self.message = {
                 'content': mock_body,

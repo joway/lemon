@@ -4,8 +4,9 @@ python:
 install:
   - pip install -r requirements.txt
 script:
+  - mypy lemon
+  - pycodestyle --exclude docs/ --ignore E501
   - coverage run --source=lemon setup.py test
   - coveralls
-  - pycodestyle --exclude docs/ --ignore E501
 notifications:
   webhooks: https://app.fossa.io/hooks/travisci

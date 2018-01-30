@@ -34,16 +34,16 @@ class Request:
 
     def __init__(
             self,
-            http_version: '1.1',
-            method: 'GET',
-            scheme: 'https',
-            path: '/',
-            query_string: b'?k=v',
+            http_version: str,
+            method: str,
+            scheme: str,
+            path: str,
+            query_string: bytes,
             headers: HttpHeaders,
             body: bytes,
-            data: ImmutableMultiDict or None,
-            client: ('1.1.1.1', '56938'),
-            server: ('127.0.0.1', '9999'),
+            data: typing.Optional[ImmutableMultiDict],
+            client: tuple,
+            server: tuple,
     ) -> None:
         self.http_version = http_version
         self.method = method.upper()
@@ -58,10 +58,10 @@ class Request:
 
         # for cache
         self._json = None
-        self._query = None
+        self._query: typing.Optional[dict] = None
 
     @property
-    def protocol(self) -> typing.Text:
+    def protocol(self) -> str:
         """http or https
         """
         return self.scheme
@@ -73,19 +73,19 @@ class Request:
         return self.scheme == 'https'
 
     @property
-    def host(self) -> typing.Text:
+    def host(self) -> str:
         """HTTP_HEADERS['Host']
         """
         return self.headers.get('host', '')
 
     @property
-    def content_type(self) -> typing.Text:
+    def content_type(self) -> str:
         """HTTP_HEADERS['Content-Type']
         """
         return self.headers.get('content-type', MIME_TYPES.TEXT_PLAIN)
 
     @property
-    def query(self) -> typing.Dict:
+    def query(self) -> dict:
         if self._query is None:
             _q = parse_qs(self.query_string)
             self._query = {k: _q[k][0] for k in _q}
@@ -96,14 +96,14 @@ class Request:
         return self.data
 
     @property
-    def json(self) -> typing.Dict:
+    def json(self) -> dict:
         """Transform request body to dict when content_type is 'application/json'
         :return: dict
         """
         return self.data.to_dict(flat=True) if self.data else None
 
     @property
-    def cookies(self) -> typing.Dict:
+    def cookies(self) -> dict:
         return parse_cookie(self.headers.get('cookie'))
 
     @classmethod

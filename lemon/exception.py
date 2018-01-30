@@ -1,6 +1,9 @@
 # ==========   GeneralException  ==========
+import typing
+
+
 class GeneralException(BaseException):
-    def __init__(self, status=None, body: str or dict = None) -> None:
+    def __init__(self, status=None, body: typing.Union[str, dict] = None) -> None:
         self.status = status
         self.body = body
 
