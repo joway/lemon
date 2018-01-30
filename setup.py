@@ -6,7 +6,7 @@ PACKAGE_REQUIRES = [
     'kua>=0.2',
     'werkzeug>=0.14.1',
 ]
-DEVELOPMENT_STATUS = '3 - Beta'
+DEVELOPMENT_STATUS = '4 - Beta'
 
 setup(
     name='pylemon',
