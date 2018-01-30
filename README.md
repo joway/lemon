@@ -12,7 +12,7 @@
 
 Lemon is an async and lightweight API framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
 
-![screenshot](docs/images/lemon-long.png)
+<p align="center"><a href="https://lemon.joway.io" target="_blank"><img width="100%" src="docs/images/lemon-long.png" alt="Lemon logo"></a></p>
 
 ## Status
 
