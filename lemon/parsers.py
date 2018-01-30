@@ -60,7 +60,7 @@ def multi_part_parser(body: bytes, headers: dict = None) -> ImmutableMultiDict:
     return ImmutableMultiDict(list(form.items()) + list(files.items()))
 
 
-DEFAULT_PARSERS_MAPPING = {
+DEFAULT_PARSERS_MAPPING: typing.Dict[str, typing.Callable] = {
     MIME_TYPES.APPLICATION_JSON: json_parser,
     MIME_TYPES.APPLICATION_X_WWW_FORM_URLENCODED: url_encoded_parser,
     MIME_TYPES.MULTIPART_FORM_DATA: multi_part_parser,
