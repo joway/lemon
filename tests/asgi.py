@@ -3,6 +3,7 @@ import typing
 
 from lemon.app import Lemon
 from lemon.const import HTTP_METHODS
+from lemon.request import HttpHeaders
 
 
 class MockReplyChannel:
@@ -27,7 +28,7 @@ class MockBodyChannel:
 
 
 class ASGIRequest:
-    def __init__(self, status, headers, content):
+    def __init__(self, status, headers: HttpHeaders, content):
         self.status = status
         self.headers = headers
         self.content = content
@@ -99,7 +100,7 @@ class ASGIHttpTestCase:
     async def asgi_request(self, method, path, query_string='', data=None, body=None, content_type=None, headers=None):
         self.mock_asgi_message(method, path, query_string, data, body, content_type, headers)
         req = await self.app.application(self.message, self.channels)
-        return ASGIRequest(req['status'], req['headers'], req['content'])
+        return ASGIRequest(req['status'], HttpHeaders(raw_headers=req['headers']), req['content'])
 
     async def get(self, path, params=None):
         query_string = ''
