@@ -1,4 +1,4 @@
-# Lemon 🍋
+<p align="center"><a href="https://lemon.joway.io" target="_blank"><img width="100%" src="docs/images/lemon-long.png" alt="Lemon logo"></a></p>
 
 [![Build Status](https://travis-ci.org/joway/lemon.svg?branch=master)](https://travis-ci.org/joway/lemon)
 [![Coverage Status](https://coveralls.io/repos/github/joway/lemon/badge.svg?branch=master)](https://coveralls.io/github/joway/lemon?branch=master)
@@ -10,13 +10,11 @@
 [![license](https://img.shields.io/github/license/joway/lemon.svg)](https://github.com/joway/lemon/blob/master/LICENSE)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoway%2Flemon.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoway%2Flemon?ref=badge_shield)
 
-Lemon is an async and lightweight API framework for python .  Inspired by [Koa](https://github.com/koajs/koa) and [Sanic](https://github.com/channelcat/sanic) .
-
-<p align="center"><a href="https://lemon.joway.io" target="_blank"><img width="100%" src="docs/images/lemon-long.png" alt="Lemon logo"></a></p>
+<h5 style="text-align: center;">Lemon is an async and lightweight API framework for python .  Inspired by <a src="https://github.com/koajs/koa" target="_blank">Koa</a> and <a src="https://github.com/channelcat/sanic" target="_blank"> Sanic </a> .</h5>
 
 ## Status
 
-ALPHA
+Beta
 
 ## Documentation
 
@@ -99,7 +97,7 @@ app.listen()
 - [x] add typing
 - [x] lemon ctx.req.form
 - [x] cookies
-- [ ] cors
+- [x] cors
 - [ ] documentation
 - [ ] benchmark
 - [ ] websocket
