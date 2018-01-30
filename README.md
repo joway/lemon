@@ -13,7 +13,7 @@
    <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fjoway%2Flemon?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoway%2Flemon.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-<h5 style="text-align: center;">Lemon is an async and lightweight API framework for python .  Inspired by <a src="https://github.com/koajs/koa" target="_blank">Koa</a> and <a src="https://github.com/channelcat/sanic" target="_blank"> Sanic </a> .</h5>
+<h5 align="center">Lemon is an async and lightweight API framework for python .  Inspired by <a src="https://github.com/koajs/koa" target="_blank">Koa</a> and <a src="https://github.com/channelcat/sanic" target="_blank"> Sanic </a> .</h5>
 
 ## Status
 
