@@ -21,30 +21,30 @@ class TestCors(BasicHttpTestCase):
             self.app,
             HTTP_METHODS.GET, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == 'a.com'
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
 
         # POST
         req = await self.asgi_request(
             self.app,
             HTTP_METHODS.POST, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == 'a.com'
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
 
         # HEAD
         req = await self.asgi_request(
             self.app,
             HTTP_METHODS.HEAD, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == 'a.com'
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
 
     async def test_cors_preflight_request(self):
         async def handle(ctx: Context):
@@ -58,12 +58,13 @@ class TestCors(BasicHttpTestCase):
             self.app,
             HTTP_METHODS.OPTIONS, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
                 [b'access-control-request-method', b'POST'],
                 [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == 'a.com'
+        assert req.status_code == 204
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
         assert req.headers['access-control-allow-methods'] == 'GET,POST,PUT,DELETE,HEAD,PATCH'
         assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
 
@@ -88,7 +89,7 @@ class TestCors(BasicHttpTestCase):
             app,
             HTTP_METHODS.OPTIONS, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
                 [b'access-control-request-method', b'POST'],
                 [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
             ]
@@ -103,10 +104,35 @@ class TestCors(BasicHttpTestCase):
             app,
             HTTP_METHODS.POST, '/',
             headers=[
-                [b'origin', b'a.com'],
+                [b'origin', b'http://a.com'],
                 [b'x-pingother', b'xxx'],
             ]
         )
         assert req.headers['access-control-allow-origin'] == '*'
         assert req.headers['access-control-allow-credentials'] == 'true'
         assert req.headers['access-control-expose-headers'] == 'test_header'
+
+    async def test_cors_not_allowed_request(self):
+        async def handle(ctx: Context):
+            ctx.body = {
+                'ack': 'ok',
+            }
+
+        app = Lemon(config={
+            'LEMON_CORS_ALLOW_METHODS': ['GET', 'POST'],
+            'LEMON_CORS_ORIGIN': 'http://a.com',
+            'LEMON_CORS_MAX_AGE': 8640,
+        }, debug=True)
+        app.use(lemon_cors_middleware, handle)
+        req = await self.asgi_request(
+            app,
+            HTTP_METHODS.OPTIONS, '/',
+            headers=[
+                [b'origin', b'https://b.com'],
+                [b'access-control-request-method', b'POST'],
+                [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
+            ]
+        )
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
+        assert req.headers['access-control-allow-methods'] == 'GET,POST'
+        assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
