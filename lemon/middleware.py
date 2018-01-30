@@ -15,4 +15,6 @@ async def lemon_error_middleware(ctx: Context, nxt: typing.Callable) -> typing.A
     except Exception as e:
         error_logger.error(e)
         ctx.status = 500
-        ctx.body = ctx.body or 'INTERNAL ERROR'
+        ctx.body = ctx.body or {
+            'lemon': 'INTERNAL ERROR',
+        }

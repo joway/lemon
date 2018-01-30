@@ -14,11 +14,11 @@ from lemon.middleware import lemon_error_middleware
 from lemon.request import Request
 from lemon.server import serve
 
-LEMON_PRE_PROCESS_MIDDLEWARE = []
-
-LEMON_POST_PROCESS_MIDDLEWARE = [
+LEMON_PRE_PROCESS_MIDDLEWARE = [
     lemon_error_middleware,
 ]
+
+LEMON_POST_PROCESS_MIDDLEWARE = []
 
 
 async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
@@ -65,7 +65,7 @@ class Lemon:
 
     @property
     def application(self) -> typing.Callable:
-        async def _wrapper(message: typing.Dict, channels: typing.Dict) -> None:
+        async def _wrapper(message: typing.Dict, channels: typing.Dict) -> typing.Any:
             """
             :param message: is an ASGI message.
             :param channels: is a dictionary of
@@ -89,32 +89,23 @@ class Lemon:
                         ctx=ctx, middleware_list=middleware_chain
                     )
                 except MiddlewareParamsError as e:
-                    await channels['reply'].send({
+                    return await channels['reply'].send({
                         'status': 500,
                         'headers': MIME_TYPES.APPLICATION_JSON,
                         'content': json.dumps({
                             'lemon': 'Your application middleware '
                                      'has wrong num of params',
-                        }),
-                    })
-                except Exception as e:
-                    logger.error(e)
-                    await channels['reply'].send({
-                        'status': 500,
-                        'headers': MIME_TYPES.APPLICATION_JSON,
-                        'content': json.dumps({
-                            'lemon': 'INTERNAL ERROR',
-                        }),
+                        }).encode(),
                     })
                 else:
-                    await channels['reply'].send(ctx.res.message)
+                    return await channels['reply'].send(ctx.res.message)
             # TODO: websocket support
             elif message['channel'] == 'websocket.connect':
-                pass
+                return None
             elif message['channel'] == 'websocket.receive':
-                pass
+                return None
             elif message['channel'] == 'websocket.disconnect':
-                pass
+                return None
 
         return _wrapper
 

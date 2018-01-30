@@ -5,10 +5,11 @@ from lemon.exception import (
     RequestBodyParserError,
     GeneralException
 )
-from tests.base import BasicTest
+
+from tests import BasicHttpTestCase
 
 
-class TestException(BasicTest):
+class TestException(BasicHttpTestCase):
     def test_exception(self):
         try:
             raise GeneralException(status=400, body='err')

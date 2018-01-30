@@ -2,11 +2,11 @@ import pytest
 
 from lemon.context import Context
 from lemon.request import Request
-from tests.base import BasicTest
+from tests import BasicHttpTestCase
 
 
 @pytest.mark.asyncio
-class TestRequest(BasicTest):
+class TestRequest(BasicHttpTestCase):
     async def test_set_context(self):
         req = await Request.from_asgi_interface({
             'channel': 'http.request',
@@ -38,17 +38,14 @@ class TestRequest(BasicTest):
         assert req.query['a'] == '1'
         assert req.query['b'] == 'hello'
 
-    def test_cookies(self):
+    async def test_cookies(self):
         async def handle(ctx: Context):
-            print(ctx.req.cookies)
             ctx.body = {
                 'ack': 'yeah !',
             }
 
-        client = self.create_http_server([handle])
-        req = client.get('/')
+        self.app.use(handle)
+        req = await self.get('/')
         data = req.json()
         assert req.status_code == 200
         assert data['ack'] == 'yeah !'
-
-        client.stop_server()
