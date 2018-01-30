@@ -1,6 +1,7 @@
 import typing
 
 from lemon.exception import GeneralException
+from lemon.request import Request
 from lemon.response import Response
 
 
@@ -10,11 +11,11 @@ class Context:
     """
 
     def __init__(self) -> None:
-        self.req = None
-        self.res = Response()
+        self.req: Request = None
+        self.res: Response = Response()
         # store middleware communication message
-        self.state = {}
-        self.params = None
+        self.state: typing.Dict = {}
+        self.params: typing.Dict = None
 
     def __setattr__(self, key, value) -> None:
         # alias
