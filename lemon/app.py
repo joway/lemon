@@ -22,6 +22,11 @@ LEMON_POST_PROCESS_MIDDLEWARE = []
 
 
 async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
+    """Exec middleware list
+    :param ctx: Context instance
+    :param middleware_list: middleware registered on app
+    :param pos: the position in middleware_list
+    """
     if pos >= len(middleware_list):
         return
     logger.debug('The No.{0} middleware started'.format(pos))
@@ -45,6 +50,7 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> 
 class Lemon:
     def __init__(self, config: typing.Dict = None, debug=False) -> None:
         """Init app instance
+        :param config: app config
         :param debug: if debug == True , set log level to DEBUG , else is INFO
         """
         self.config = config
@@ -56,12 +62,11 @@ class Lemon:
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
-    def use(self, *middlewares) -> None:
+    def use(self, *middleware) -> None:
         """Register middleware into app
-
-        :param middlewares: the chain of the middleware
+        :param middleware: the chain of the middleware
         """
-        self.middleware_list.extend(middlewares)
+        self.middleware_list.extend(middleware)
 
     @property
     def application(self) -> typing.Callable:
@@ -69,8 +74,6 @@ class Lemon:
             """
             :param message: is an ASGI message.
             :param channels: is a dictionary of
-             <unicode string>:<channel interface>.
-            :return: asgi application
             """
             if message['channel'] == 'http.request':
                 # init context
@@ -111,6 +114,9 @@ class Lemon:
 
     def listen(self, host: str = None, port: str or int = None) -> None:
         """Running server with binding host:port
+        :param host: eg: "127.0.0.1"
+        :param port: eg: 9999
+        :return:
         """
         _host = host or settings.LEMON_SERVER_HOST
         _port = port or settings.LEMON_SERVER_PORT

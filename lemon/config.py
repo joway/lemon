@@ -5,10 +5,17 @@ from lemon.exception import LemonConfigKeyError
 
 class LemonConfig:
     def __init__(self, default_config: typing.Dict = None, config: typing.Dict = None):
+        """
+        :param default_config: default app config
+        :param config: app config
+        """
         self._default_config = default_config or {}
         self._config = config or {}
 
     def set_config(self, config: typing.Dict):
+        """
+        :param config: app config
+        """
         self._config = config or {}
 
     def __getattr__(self, key: typing.Text):
