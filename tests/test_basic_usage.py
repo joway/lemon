@@ -71,7 +71,7 @@ class TestBasicUsage(BasicHttpTestCase):
             body=b'----------------------------927900071949197777043086\r\nContent-Disposition: form-data; '
                  b'name="xxx"; filename="avatar.jpg"\r\nContent-Type: '
                  b'image/jpeg\r\n\r\n' + 'xxx'.encode() + b'\r\n'
-                 b'----------------------------927900071949197777043086--\r\n',
+                                                          b'----------------------------927900071949197777043086--\r\n',
         )
         data = req.json()
         assert req.status_code == 200
@@ -140,12 +140,23 @@ class TestBasicUsage(BasicHttpTestCase):
 
     async def test_cookies(self):
         async def handle(ctx: Context):
+            my_cookie = ctx.req.cookies.get('my_cookie')
+            my_cookie2 = ctx.req.cookies.get('my_cookie2')
             ctx.body = {
-                'ack': 'yeah !',
+                'my_cookie': my_cookie,
+                'my_cookie2': my_cookie2,
             }
 
         self.app.use(handle)
-        req = await self.get('/')
+        req = await self.asgi_request(
+            method='POST',
+            path='/',
+            headers=[[
+                b'cookie',
+                b'my_cookie=xxx; my_cookie2=xxx2'
+            ]],
+        )
         data = req.json()
         assert req.status_code == 200
-        assert data['ack'] == 'yeah !'
+        assert data['my_cookie'] == 'xxx'
+        assert data['my_cookie2'] == 'xxx2'

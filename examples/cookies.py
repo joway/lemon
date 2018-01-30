@@ -3,9 +3,9 @@ from lemon.context import Context
 
 
 async def handle(ctx: Context):
-    data = ctx.req.data
+    my_cookie = ctx.req.cookies.get('my_cookie')
     ctx.body = {
-        'file_content': data['file'].read().decode(),
+        'my_cookie': my_cookie,
     }
 
 
