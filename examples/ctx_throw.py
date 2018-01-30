@@ -6,7 +6,6 @@ async def middleware(ctx: Context):
     ctx.throw(status=403, body={
         'msg': '403'
     })
-    assert False
 
 
 app = Lemon(debug=True)

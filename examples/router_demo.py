@@ -1,5 +1,3 @@
-from random import random
-
 from lemon.app import Lemon
 from lemon.context import Context
 from lemon.router import SimpleRouter
@@ -14,7 +12,6 @@ async def middleware(ctx: Context, nxt):
 
 async def handler1(ctx: Context):
     ctx.body['ack'] = 'yeah !'
-    ctx.body['random'] = random()
 
 
 async def handler2(ctx: Context):
