@@ -5,8 +5,8 @@ from tests import BasicHttpTestCase
 
 
 @pytest.mark.asyncio
-class TestApp(BasicHttpTestCase):
-    async def test_json_response(self):
+class TestBasicUsage(BasicHttpTestCase):
+    async def test_get_json(self):
         async def handle(ctx: Context):
             ctx.body = {
                 'ack': 'yeah !',
@@ -18,7 +18,7 @@ class TestApp(BasicHttpTestCase):
         assert req.status_code == 200
         assert ret['ack'] == 'yeah !'
 
-    async def test_string_response(self):
+    async def test_get_string(self):
         async def handle(ctx: Context):
             ctx.body = 'xxxxxx'
 
@@ -27,7 +27,7 @@ class TestApp(BasicHttpTestCase):
         assert req.status_code == 200
         assert req.text == 'xxxxxx'
 
-    async def test_json_post(self):
+    async def test_post_json(self):
         async def handle(ctx: Context):
             ctx.body = ctx.req.json
 
@@ -40,6 +40,42 @@ class TestApp(BasicHttpTestCase):
         data = req.json()
         assert data['int'] == 1
         assert data['str'] == 'xxx'
+
+    async def test_post_form(self):
+        async def handle(ctx: Context):
+            data = ctx.req.json
+            ctx.body = {
+                'hi': data['hi'],
+            }
+
+        self.app.use(handle)
+        req = await self.post(path='/', data={
+            'hi': 'hello'
+        })
+        data = req.json()
+        assert req.status_code == 200
+        assert data['hi'] == 'hello'
+
+    async def test_post_multipart(self):
+        async def handle(ctx: Context):
+            data = ctx.req.data
+            ctx.body = {
+                'ack': data['xxx'].read().decode(),
+            }
+
+        self.app.use(handle)
+        req = await self.asgi_request(
+            method='POST',
+            path='/',
+            content_type=b'multipart/form-data; boundary=--------------------------927900071949197777043086',
+            body=b'----------------------------927900071949197777043086\r\nContent-Disposition: form-data; '
+                 b'name="xxx"; filename="avatar.jpg"\r\nContent-Type: '
+                 b'image/jpeg\r\n\r\n' + 'xxx'.encode() + b'\r\n'
+                 b'----------------------------927900071949197777043086--\r\n',
+        )
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'xxx'
 
     async def test_other_method(self):
         async def handle(ctx: Context):
@@ -61,15 +97,7 @@ class TestApp(BasicHttpTestCase):
         assert req.status_code == 200
         assert data['ack'] == 'yeah !'
 
-    async def test_throw(self):
-        async def handle(ctx: Context):
-            raise Exception
-
-        self.app.use(handle)
-        req = await self.get('/')
-        assert req.status_code == 500
-
-    async def test_middleware_and_handler(self):
+    async def test_handlers(self):
         async def middleware(ctx: Context, nxt):
             ctx.body = {
                 'msg': 'hello world'
@@ -109,3 +137,15 @@ class TestApp(BasicHttpTestCase):
         data = req.json()
         assert req.status_code == 400
         assert data['msg'] == 'error handled'
+
+    async def test_cookies(self):
+        async def handle(ctx: Context):
+            ctx.body = {
+                'ack': 'yeah !',
+            }
+
+        self.app.use(handle)
+        req = await self.get('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['ack'] == 'yeah !'

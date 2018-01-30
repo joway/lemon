@@ -106,6 +106,8 @@ class Request:
     @classmethod
     async def from_asgi_interface(cls, message, channels) -> typing.Any:
         body = await cls.read_body(message, channels)
+        print('message', message)
+        print('body', body)
 
         # decode headers
         headers_dict = {}
