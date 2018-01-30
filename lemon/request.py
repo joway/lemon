@@ -16,7 +16,7 @@ class HttpHeaders(dict):
                 self.__setitem__(h[0].decode(), h[1].decode())
 
     def __setitem__(self, key: str, value):
-        return super(HttpHeaders, self).__setitem__(key.lower(), value)
+        return super(HttpHeaders, self).__setitem__(key.lower(), str(value))
 
     def __getitem__(self, key: str):
         return super(HttpHeaders, self).__getitem__(key.lower())

@@ -65,6 +65,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
         self.app.use(handle)
         req = await self.asgi_request(
+            app=self.app,
             method='POST',
             path='/',
             content_type=b'multipart/form-data; boundary=--------------------------927900071949197777043086',
@@ -149,6 +150,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
         self.app.use(handle)
         req = await self.asgi_request(
+            app=self.app,
             method='POST',
             path='/',
             headers=[[
