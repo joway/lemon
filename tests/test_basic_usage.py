@@ -65,6 +65,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
         self.app.use(handle)
         req = await self.asgi_request(
+            app=self.app,
             method='POST',
             path='/',
             content_type=b'multipart/form-data; boundary=--------------------------927900071949197777043086',
@@ -149,6 +150,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
         self.app.use(handle)
         req = await self.asgi_request(
+            app=self.app,
             method='POST',
             path='/',
             headers=[[
@@ -160,3 +162,13 @@ class TestBasicUsage(BasicHttpTestCase):
         assert req.status_code == 200
         assert data['my_cookie'] == 'xxx'
         assert data['my_cookie2'] == 'xxx2'
+
+    async def test_set_headers(self):
+        async def handle(ctx: Context):
+            ctx.res.headers['test_headers'] = 'xxx'
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status_code == 200
+        assert req.headers['test_headers'] == 'xxx'

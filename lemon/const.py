@@ -11,3 +11,4 @@ class HTTP_METHODS:
     POST = 'POST'
     DELETE = 'DELETE'
     OPTIONS = 'OPTIONS'
+    HEAD = 'HEAD'

@@ -8,6 +8,23 @@ from lemon.const import MIME_TYPES
 from lemon.parsers import parse_http_body
 
 
+class HttpHeaders(dict):
+    def __init__(self, raw_headers=None, *args, **kwargs):
+        super(HttpHeaders, self).__init__(*args, **kwargs)
+        if raw_headers:
+            for h in raw_headers:
+                self.__setitem__(h[0].decode(), h[1].decode())
+
+    def __setitem__(self, key: str, value):
+        return super(HttpHeaders, self).__setitem__(key.lower(), str(value))
+
+    def __getitem__(self, key: str):
+        return super(HttpHeaders, self).__getitem__(key.lower())
+
+    def set(self, key: str, value):
+        return self.__setitem__(key, value)
+
+
 class Request:
     """The Request object store the current request's fully information
 
@@ -22,7 +39,7 @@ class Request:
             scheme: 'https',
             path: '/',
             query_string: b'?k=v',
-            headers: typing.Dict,
+            headers: HttpHeaders,
             body: bytes,
             data: ImmutableMultiDict or None,
             client: ('1.1.1.1', '56938'),
@@ -108,13 +125,12 @@ class Request:
         body = await cls.read_body(message, channels)
 
         # decode headers
-        headers_dict = {}
+        http_headers = HttpHeaders()
         for h in message['headers']:
-            headers_dict[h[0].decode().lower()] = h[1].decode()
-        headers_dict = headers_dict
+            http_headers[h[0].decode()] = h[1].decode()
 
         # parse body
-        parsed_body = parse_http_body(headers=headers_dict, body=body)
+        parsed_body = parse_http_body(headers=http_headers, body=body)
 
         # create request
         return Request(
@@ -123,7 +139,7 @@ class Request:
             scheme=message['scheme'],
             path=message['path'],
             query_string=message['query_string'].decode('utf-8'),
-            headers=headers_dict,
+            headers=http_headers,
             body=body,
             data=parsed_body,
             client=message['client'],

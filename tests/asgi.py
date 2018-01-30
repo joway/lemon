@@ -3,6 +3,7 @@ import typing
 
 from lemon.app import Lemon
 from lemon.const import HTTP_METHODS
+from lemon.request import HttpHeaders
 
 
 class MockReplyChannel:
@@ -27,7 +28,7 @@ class MockBodyChannel:
 
 
 class ASGIRequest:
-    def __init__(self, status, headers, content):
+    def __init__(self, status, headers: HttpHeaders, content):
         self.status = status
         self.headers = headers
         self.content = content
@@ -96,10 +97,11 @@ class ASGIHttpTestCase:
                 [b'content-type', _content_type],
             )
 
-    async def asgi_request(self, method, path, query_string='', data=None, body=None, content_type=None, headers=None):
+    async def asgi_request(self, app, method, path, query_string='', data=None, body=None, content_type=None,
+                           headers=None):
         self.mock_asgi_message(method, path, query_string, data, body, content_type, headers)
-        req = await self.app.application(self.message, self.channels)
-        return ASGIRequest(req['status'], req['headers'], req['content'])
+        req = await app.application(self.message, self.channels)
+        return ASGIRequest(req['status'], HttpHeaders(raw_headers=req['headers']), req['content'])
 
     async def get(self, path, params=None):
         query_string = ''
@@ -111,6 +113,7 @@ class ASGIHttpTestCase:
             query_string += '&'.join(params)
 
         return await self.asgi_request(
+            app=self.app,
             method=HTTP_METHODS.GET,
             path=path,
             query_string=query_string,
@@ -118,6 +121,7 @@ class ASGIHttpTestCase:
 
     async def post(self, path, data=None):
         return await self.asgi_request(
+            app=self.app,
             method=HTTP_METHODS.POST,
             path=path,
             data=data,
@@ -125,6 +129,7 @@ class ASGIHttpTestCase:
 
     async def put(self, path, data=None):
         return await self.asgi_request(
+            app=self.app,
             method=HTTP_METHODS.PUT,
             path=path,
             data=data,
@@ -132,6 +137,7 @@ class ASGIHttpTestCase:
 
     async def delete(self, path, data=None):
         return await self.asgi_request(
+            app=self.app,
             method=HTTP_METHODS.DELETE,
             path=path,
             data=data,
