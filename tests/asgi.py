@@ -146,3 +146,11 @@ class ASGIHttpTestCase:
             path=path,
             data=data,
         )
+
+    async def options(self, path, data=None):
+        return await self.asgi_request(
+            app=self.app,
+            method=HTTP_METHODS.OPTIONS,
+            path=path,
+            data=data,
+        )

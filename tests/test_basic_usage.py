@@ -97,6 +97,8 @@ class TestBasicUsage(BasicHttpTestCase):
         data = req.json()
         assert req.status_code == 200
         assert data['ack'] == 'yeah !'
+        req = await self.options('/')
+        assert req.status_code == 200
 
     async def test_handlers(self):
         async def middleware(ctx: Context, nxt):

@@ -204,3 +204,5 @@ class Router(AbstractBaseRouter):
             return self._routes[method].match(path)
         except kua.RouteError:
             return None
+        except KeyError:
+            return None
