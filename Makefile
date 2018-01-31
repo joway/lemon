@@ -10,5 +10,11 @@ test:
 lint:
 	pycodestyle --exclude docs/ --ignore E501
 
+hint:
+	mypy lemon --ignore-missing-imports
+
+check:
+	make hint test lint
+
 docs:
 	sphinx-build -b html docs/source docs/build
