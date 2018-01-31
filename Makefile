@@ -5,7 +5,7 @@ release:
 	python setup.py sdist upload
 
 test:
-	python setup.py test
+	pytest -qq
 
 lint:
 	pycodestyle --exclude docs/ --ignore E501
@@ -14,7 +14,7 @@ hint:
 	mypy lemon --ignore-missing-imports
 
 check:
-	make hint test lint
+	make hint lint test
 
 docs:
 	sphinx-build -b html docs/source docs/build
