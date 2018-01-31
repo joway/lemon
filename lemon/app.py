@@ -17,10 +17,6 @@ from lemon.server import serve
 LEMON_PRE_PROCESS_MIDDLEWARE: list = [
     exception_middleware,
 ]
-if settings.LEMON_CORS_ENABLE:
-    LEMON_PRE_PROCESS_MIDDLEWARE.append(
-        cors_middleware,
-    )
 
 LEMON_POST_PROCESS_MIDDLEWARE: list = []
 
@@ -73,6 +69,13 @@ class Lemon:
 
         self.middleware_list: list = []
 
+        self.pre_process_middleware_list = LEMON_PRE_PROCESS_MIDDLEWARE
+        self.post_process_middleware_list = LEMON_POST_PROCESS_MIDDLEWARE
+        if settings.LEMON_CORS_ENABLE:
+            self.pre_process_middleware_list.append(
+                cors_middleware,
+            )
+
         # logging
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
@@ -98,9 +101,9 @@ class Lemon:
                     message=message, channels=channels
                 )
                 middleware_chain = \
-                    LEMON_PRE_PROCESS_MIDDLEWARE \
+                    self.pre_process_middleware_list \
                     + self.middleware_list \
-                    + LEMON_POST_PROCESS_MIDDLEWARE
+                    + self.post_process_middleware_list
 
                 try:
                     await exec_middleware(

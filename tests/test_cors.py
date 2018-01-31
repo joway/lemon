@@ -3,7 +3,6 @@ import pytest
 from lemon.app import Lemon
 from lemon.const import HTTP_METHODS
 from lemon.context import Context
-from lemon.middleware import cors_middleware
 from tests import BasicHttpTestCase
 
 
@@ -15,7 +14,7 @@ class TestCors(BasicHttpTestCase):
                 'ack': 'ok',
             }
 
-        self.app.use(cors_middleware, handle)
+        self.app.use(handle)
         # GET
         req = await self.asgi_request(
             self.app,
@@ -52,7 +51,7 @@ class TestCors(BasicHttpTestCase):
                 'ack': 'ok',
             }
 
-        self.app.use(cors_middleware, handle)
+        self.app.use(handle)
 
         req = await self.asgi_request(
             self.app,
@@ -82,7 +81,7 @@ class TestCors(BasicHttpTestCase):
             'LEMON_CORS_ORIGIN': '*',
             'LEMON_CORS_MAX_AGE': 8640,
         }, debug=True)
-        app.use(cors_middleware, handle)
+        app.use(handle)
 
         # preflight
         req = await self.asgi_request(
@@ -123,7 +122,7 @@ class TestCors(BasicHttpTestCase):
             'LEMON_CORS_ORIGIN': 'http://a.com',
             'LEMON_CORS_MAX_AGE': 8640,
         }, debug=True)
-        app.use(cors_middleware, handle)
+        app.use(handle)
         req = await self.asgi_request(
             app,
             HTTP_METHODS.OPTIONS, '/',

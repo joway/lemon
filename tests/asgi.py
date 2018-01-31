@@ -1,5 +1,4 @@
 import json
-import typing
 
 from lemon.app import Lemon
 from lemon.const import HTTP_METHODS
@@ -50,7 +49,12 @@ class ASGIHttpTestCase:
     port = 9999
 
     def setup_method(self, method):
-        self.app = Lemon(debug=True)
+        self.app = Lemon(
+            config={
+                'LEMON_CORS_ENABLE': True,
+            },
+            debug=True
+        )
 
         self.message = {
             'channel': 'http.request',
