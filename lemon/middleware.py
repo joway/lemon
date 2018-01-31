@@ -1,3 +1,4 @@
+import re
 import traceback
 import typing
 
@@ -23,7 +24,7 @@ async def exception_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any
 
 async def cors_middleware(ctx: Context, nxt: typing.Callable):
     # settings
-    LEMON_CORS_ORIGIN = settings.LEMON_CORS_ORIGIN
+    LEMON_CORS_ORIGIN_WHITELIST = settings.LEMON_CORS_ORIGIN_WHITELIST
     LEMON_CORS_ALLOW_METHODS = settings.LEMON_CORS_ALLOW_METHODS
     LEMON_CORS_ALLOW_HEADERS = settings.LEMON_CORS_ALLOW_HEADERS
     LEMON_CORS_EXPOSE_HEADERS = settings.LEMON_CORS_EXPOSE_HEADERS
@@ -31,7 +32,7 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
     LEMON_CORS_MAX_AGE = settings.LEMON_CORS_MAX_AGE
 
     headers = ctx.req.headers
-    origin = LEMON_CORS_ORIGIN or headers.get('origin', None)
+    origin = headers.get('origin', None)
 
     # pass request
     if origin is None:
@@ -44,6 +45,14 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
         if acrm is None:
             return await nxt()
 
+        matched = False
+        for domain_pattern in LEMON_CORS_ORIGIN_WHITELIST:
+            if re.match(domain_pattern, origin):
+                matched = True
+        if not matched:
+            ctx.status = 200
+            return
+
         ctx.res.headers['access-control-allow-origin'] = origin
 
         if LEMON_CORS_ALLOW_CREDENTIALS:
@@ -52,7 +61,6 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
         ctx.res.headers['access-control-max-age'] = LEMON_CORS_MAX_AGE
         ctx.res.headers['access-control-allow-methods'] = ','.join(LEMON_CORS_ALLOW_METHODS)
         ctx.res.headers['access-control-allow-headers'] = ','.join(LEMON_CORS_ALLOW_HEADERS) or acrh
-        ctx.status = 204
         # stop request
         return
 
