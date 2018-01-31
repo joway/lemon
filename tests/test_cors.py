@@ -51,10 +51,18 @@ class TestCors(BasicHttpTestCase):
                 'ack': 'ok',
             }
 
-        self.app.use(handle)
+        app = Lemon(config={
+            'LEMON_CORS_ENABLE': True,
+            'LEMON_CORS_ALLOW_METHODS': ['GET', 'POST'],
+            'LEMON_CORS_ALLOW_CREDENTIALS': True,
+            'LEMON_CORS_ORIGIN_WHITELIST': [
+                'http://a.com',
+            ],
+        }, debug=True)
+        app.use(handle)
 
         req = await self.asgi_request(
-            self.app,
+            app,
             HTTP_METHODS.OPTIONS, '/',
             headers=[
                 [b'origin', b'http://a.com'],
@@ -64,7 +72,7 @@ class TestCors(BasicHttpTestCase):
         )
         assert req.status_code == 204
         assert req.headers['access-control-allow-origin'] == 'http://a.com'
-        assert req.headers['access-control-allow-methods'] == 'GET,POST,PUT,DELETE,HEAD,PATCH'
+        assert req.headers['access-control-allow-methods'] == 'GET,POST'
         assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
 
     async def test_cors_config(self):
@@ -74,11 +82,17 @@ class TestCors(BasicHttpTestCase):
             }
 
         app = Lemon(config={
+            'LEMON_CORS_ENABLE': True,
             'LEMON_CORS_ALLOW_METHODS': ['GET', 'POST'],
             'LEMON_CORS_ALLOW_HEADERS': ['allow_header'],
             'LEMON_CORS_EXPOSE_HEADERS': ['test_header'],
             'LEMON_CORS_ALLOW_CREDENTIALS': True,
-            'LEMON_CORS_ORIGIN': '*',
+            'LEMON_CORS_ORIGIN_WHITELIST': [
+                'http://a.com',
+            ],
+            'LEMON_CORS_ORIGIN_REGEX_WHITELIST': [
+                r'^(https?://)?(\w+\.)?b\.com$',
+            ],
             'LEMON_CORS_MAX_AGE': 8640,
         }, debug=True)
         app.use(handle)
@@ -93,7 +107,7 @@ class TestCors(BasicHttpTestCase):
                 [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == '*'
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
         assert req.headers['access-control-allow-methods'] == 'GET,POST'
         assert req.headers['access-control-allow-headers'] == 'allow_header'
         assert req.headers['access-control-allow-credentials'] == 'true'
@@ -107,7 +121,7 @@ class TestCors(BasicHttpTestCase):
                 [b'x-pingother', b'xxx'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == '*'
+        assert req.headers['access-control-allow-origin'] == 'http://a.com'
         assert req.headers['access-control-allow-credentials'] == 'true'
         assert req.headers['access-control-expose-headers'] == 'test_header'
 
@@ -118,8 +132,11 @@ class TestCors(BasicHttpTestCase):
             }
 
         app = Lemon(config={
+            'LEMON_CORS_ENABLE': True,
             'LEMON_CORS_ALLOW_METHODS': ['GET', 'POST'],
-            'LEMON_CORS_ORIGIN': 'http://a.com',
+            'LEMON_CORS_ORIGIN_WHITELIST': [
+                'http://a.com',
+            ],
             'LEMON_CORS_MAX_AGE': 8640,
         }, debug=True)
         app.use(handle)
@@ -132,6 +149,4 @@ class TestCors(BasicHttpTestCase):
                 [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
             ]
         )
-        assert req.headers['access-control-allow-origin'] == 'http://a.com'
-        assert req.headers['access-control-allow-methods'] == 'GET,POST'
-        assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
+        assert 'access-control-allow-origin' not in req.headers
