@@ -25,6 +25,7 @@ async def exception_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any
 async def cors_middleware(ctx: Context, nxt: typing.Callable):
     # settings
     LEMON_CORS_ORIGIN_WHITELIST = settings.LEMON_CORS_ORIGIN_WHITELIST
+    LEMON_CORS_ORIGIN_REGEX_WHITELIST = settings.LEMON_CORS_ORIGIN_REGEX_WHITELIST
     LEMON_CORS_ALLOW_METHODS = settings.LEMON_CORS_ALLOW_METHODS
     LEMON_CORS_ALLOW_HEADERS = settings.LEMON_CORS_ALLOW_HEADERS
     LEMON_CORS_EXPOSE_HEADERS = settings.LEMON_CORS_EXPOSE_HEADERS
@@ -46,10 +47,13 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
             return await nxt()
 
         matched = False
-        for domain_pattern in LEMON_CORS_ORIGIN_WHITELIST:
+        for domain in LEMON_CORS_ORIGIN_WHITELIST:
+            if domain == origin:
+                matched = True
+        for domain_pattern in LEMON_CORS_ORIGIN_REGEX_WHITELIST:
             if re.match(domain_pattern, origin):
                 matched = True
-        if not matched:
+        if matched is False:
             ctx.status = 200
             return
 
@@ -62,6 +66,7 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
         ctx.res.headers['access-control-allow-methods'] = ','.join(LEMON_CORS_ALLOW_METHODS)
         ctx.res.headers['access-control-allow-headers'] = ','.join(LEMON_CORS_ALLOW_HEADERS) or acrh
         # stop request
+        ctx.status = 204
         return
 
     # cross origin request
