@@ -6,7 +6,7 @@ from tests import BasicHttpTestCase
 
 @pytest.mark.asyncio
 class TestMiddleware(BasicHttpTestCase):
-    async def test_error_middleware(self):
+    async def test_exception_middleware(self):
         async def handle(ctx: Context):
             raise Exception
 

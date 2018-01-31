@@ -10,13 +10,17 @@ from lemon.const import MIME_TYPES
 from lemon.context import Context
 from lemon.exception import MiddlewareParamsError
 from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
-from lemon.middleware import lemon_error_middleware
+from lemon.middleware import exception_middleware, cors_middleware
 from lemon.request import Request
 from lemon.server import serve
 
 LEMON_PRE_PROCESS_MIDDLEWARE: list = [
-    lemon_error_middleware,
+    exception_middleware,
 ]
+if settings.LEMON_CORS_ENABLE:
+    LEMON_PRE_PROCESS_MIDDLEWARE.append(
+        cors_middleware,
+    )
 
 LEMON_POST_PROCESS_MIDDLEWARE: list = []
 

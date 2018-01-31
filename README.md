@@ -96,7 +96,7 @@ app.listen()
 - [x] add typing
 - [x] lemon ctx.req.form
 - [x] cookies
-- [x] cors
+- [x] cors_middleware
 - [ ] documentation
 - [ ] benchmark
 - [ ] websocket
