@@ -1,6 +1,6 @@
 import json
 
-from lemon.const import MIME_TYPES
+from lemon.const import MIME_TYPES, CHARSETS
 from lemon.exception import ResponseFormatError
 from lemon.request import HttpHeaders
 
@@ -9,11 +9,13 @@ class Response:
     def __init__(
             self, status: int = 200, headers: HttpHeaders = None,
             body: str = None, content_type: str = MIME_TYPES.TEXT_PLAIN,
+            charset: str = CHARSETS.UTF8,
     ) -> None:
         self.status = status
         self.headers = headers if headers else HttpHeaders()
         self.content_type = content_type
         self.body = body or ''
+        self.charset = charset
 
     @property
     def message(self) -> dict:
@@ -28,8 +30,13 @@ class Response:
         else:
             raise ResponseFormatError
 
+        content_type = self.content_type
+        if self.charset:
+            content_type = '{type}; {charset}'.format(
+                type=self.content_type, charset=self.charset
+            )
         header_pairs = [
-            [b'content-type', self.content_type.encode()],
+            [b'content-type', content_type.encode()],
         ]
         for h in self.headers:
             header_pairs.append([

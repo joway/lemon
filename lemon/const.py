@@ -5,6 +5,10 @@ class MIME_TYPES:
     MULTIPART_FORM_DATA = 'multipart/form-data'
 
 
+class CHARSETS:
+    UTF8 = 'utf-8'
+
+
 class HTTP_METHODS:
     GET = 'GET'
     PUT = 'PUT'
