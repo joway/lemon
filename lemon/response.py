@@ -30,11 +30,9 @@ class Response:
         else:
             raise ResponseFormatError
 
-        content_type = self.content_type
-        if self.charset:
-            content_type = '{type}; {charset}'.format(
-                type=self.content_type, charset=self.charset
-            )
+        content_type = '{type}; {charset}'.format(
+            type=self.content_type, charset=self.charset
+        )
         header_pairs = [
             [b'content-type', content_type.encode()],
         ]
