@@ -161,8 +161,9 @@ class Lemon:
             elif message['channel'] == 'websocket.disconnect':
                 try:
                     self.ws_conns.remove(ws_conn)
-                except:
-                    pass
+                except RuntimeError as e:
+                    # TODO : fix remove
+                    logger.error(e)
                 await ws_conn.destroy()
                 logger.info(f'Websocket disconnected')
             # receive msg from client
