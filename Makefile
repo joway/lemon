@@ -2,7 +2,9 @@ init:
 	pip install -r requirements.txt
 
 release:
-	git tag `cat setup.py | grep 'PACKAGE_VERSION = ' | sed "s/PACKAGE_VERSION = //"`
+	PACKAGE_VERSION=`cat setup.py | grep 'PACKAGE_VERSION = ' | sed "s/PACKAGE_VERSION = //"`
+	git tag $PACKAGE_VERSION
+	git push origin $PACKAGE_VERSION
 	python setup.py sdist upload
 
 test:
