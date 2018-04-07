@@ -1,5 +1,7 @@
+import asyncio
 import json
 import logging.config
+import time
 import typing
 from asyncio import get_event_loop
 from functools import partial
@@ -13,6 +15,7 @@ from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
 from lemon.middleware import exception_middleware, cors_middleware
 from lemon.request import Request
 from lemon.server import serve
+from lemon.wsconnection import WSConnection, WSMessage
 
 LEMON_PRE_PROCESS_MIDDLEWARE: list = [
     exception_middleware,
@@ -58,6 +61,11 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> 
         )
 
 
+# websocket: empty handler
+async def empty_handler(*args, **kwargs):
+    pass
+
+
 class Lemon:
     def __init__(self, config: dict = None, debug=False) -> None:
         """Init app instance
@@ -68,7 +76,6 @@ class Lemon:
         settings.set_config(config=config)
 
         self.middleware_list: list = []
-
         self.pre_process_middleware_list = LEMON_PRE_PROCESS_MIDDLEWARE
         self.post_process_middleware_list = LEMON_POST_PROCESS_MIDDLEWARE
         if settings.LEMON_CORS_ENABLE:
@@ -76,9 +83,24 @@ class Lemon:
                 cors_middleware,
             )
 
+        # websocket
+        self.ws_enable = False
+        self.ws_pull = None
+        self.ws_push = None
+        self.ws_conns = set()
+
         # logging
         logging.config.dictConfig(LOGGING_CONFIG_DEFAULTS)
         logger.setLevel(logging.DEBUG if debug else logging.INFO)
+
+    def ws(self, ws_pull: typing.Callable, ws_push: typing.Callable):
+        """Register pull and push handlers for websocket connections
+        :param ws_pull: handler function to pull from server
+        :param ws_push: handler function to push to client
+        """
+        self.ws_enable = True
+        self.ws_pull = ws_pull
+        self.ws_push = ws_push
 
     def use(self, *middleware) -> None:
         """Register middleware into app
@@ -88,6 +110,14 @@ class Lemon:
 
     @property
     def application(self) -> typing.Callable:
+        # websocket enable : push message to client
+        # if self.ws_enable:
+        #     # TODO: auto timeout connection
+        #     pass
+        #
+        #     # push daemon
+        #     asyncio.ensure_future(self.ws_push(self.ws_conns))
+
         async def _wrapper(message: dict, channels: dict) -> typing.Any:
             """
             :param message: is an ASGI message.
@@ -96,7 +126,7 @@ class Lemon:
             if message['channel'] == 'http.request':
                 # init context
                 ctx = Context()
-                # prepare request
+                # prepare HTTP request
                 ctx.req = await Request.from_asgi_interface(
                     message=message, channels=channels
                 )
@@ -120,13 +150,27 @@ class Lemon:
                     })
                 else:
                     return await channels['reply'].send(ctx.res.message)
-            # TODO: websocket support
-            elif message['channel'] == 'websocket.connect':
-                return None
-            elif message['channel'] == 'websocket.receive':
-                return None
+
+            # websocket connection
+            ws_conn = WSConnection(channels['reply']._websocket)
+            if message['channel'] == 'websocket.connect':
+                await ws_conn.establish()
+                self.ws_conns.add(ws_conn)
+                logger.info(f'Websocket connected')
+            # disconnect
             elif message['channel'] == 'websocket.disconnect':
-                return None
+                try:
+                    self.ws_conns.remove(ws_conn)
+                except RuntimeError as e:
+                    # TODO : fix remove
+                    logger.error(e)
+                await ws_conn.destroy()
+                logger.info(f'Websocket disconnected')
+            # receive msg from client
+            elif message['channel'] == 'websocket.receive':
+                ws_msg = WSMessage(message)
+                await self.ws_pull(ws_conn, ws_msg)
+                logger.info(f'Websocket receive message')
 
         return _wrapper
 
