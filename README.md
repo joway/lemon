@@ -86,17 +86,3 @@ app.use(router.routes())
 app.listen()
 
 ```
-
-
-
-## TODO
-
-- [x] tests
-- [x] lemon router
-- [x] add typing
-- [x] lemon ctx.req.form
-- [x] cookies
-- [x] cors_middleware
-- [ ] documentation
-- [ ] benchmark
-- [ ] websocket
