@@ -51,7 +51,7 @@ app.listen(port=9999)
 
 ## Hello Lemon Router
 
-```
+```python
 from random import random
 
 from lemon.app import Lemon
