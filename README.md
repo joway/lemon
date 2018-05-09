@@ -1,4 +1,4 @@
-<p align="center"><a href="https://lemon.joway.io" target="_blank"><img width="100%" src="docs/images/lemon-long.png" alt="Lemon logo"></a></p>
+<p align="center"><a href="https://pylemon.com" target="_blank"><img width="100%" src="docs/images/lemon-long.png" alt="Lemon logo"></a></p>
 
 <p align="center">
 	<a target="_blank" href="https://travis-ci.org/joway/lemon"><img src="https://travis-ci.org/joway/lemon.svg?branch=master" alt="Build Status"></a>
@@ -17,7 +17,7 @@
 
 ## Documentation
 
-[https://lemon.joway.io](https://lemon.joway.io/#/)
+[https://pylemon.com](https://pylemon.com/#/)
 
 ## Installation
 
