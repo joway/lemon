@@ -1,10 +1,10 @@
 from setuptools import setup
 
-PACKAGE_VERSION = '0.1.6'
+PACKAGE_VERSION = '0.2.0'
 PACKAGE_REQUIRES = [
-    'uvicorn>=0.0.15',
-    'kua>=0.2',
-    'werkzeug>=0.14.1',
+    'uvicorn==0.1.1',
+    'kua==0.2',
+    'werkzeug==0.14.1',
 ]
 DEVELOPMENT_STATUS = '4 - Beta'
 
