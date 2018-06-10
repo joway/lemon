@@ -8,14 +8,25 @@ from tests import BasicHttpTestCase
 class TestBasicUsage(BasicHttpTestCase):
     async def test_get_json(self):
         async def handle(ctx: Context):
+            ctx.status = 201
             ctx.body = {
                 'ack': 'yeah !',
             }
 
+            assert ctx.status == 201
+            assert ctx.req.scheme == 'http'
+            assert ctx.req.protocol == 'http'
+            assert ctx.req.host == '127.0.0.1:9999'
+            assert ctx.req.secure is False
+            assert ctx.req.query_string == 'msg=1'
+            assert ctx.req.query['msg'] == '1'
+
         self.app.use(handle)
-        req = await self.get('/')
+        req = await self.get('/', params={
+            'msg': '1',
+        })
         ret = req.json()
-        assert req.status_code == 200
+        assert req.status_code == 201
         assert ret['ack'] == 'yeah !'
 
     async def test_get_string(self):
@@ -30,6 +41,10 @@ class TestBasicUsage(BasicHttpTestCase):
     async def test_post_json(self):
         async def handle(ctx: Context):
             ctx.body = ctx.req.json
+            assert ctx.req.form['int'] == 1
+            assert ctx.req.form['str'] == 'xxx'
+            assert ctx.req.data['str'] == 'xxx'
+            assert ctx.req.data['str'] == 'xxx'
 
         self.app.use(handle)
         req = await self.post('/', data={
@@ -176,3 +191,43 @@ class TestBasicUsage(BasicHttpTestCase):
         req = await self.get('/')
         assert req.status_code == 200
         assert req.headers['test_headers'] == 'xxx'
+
+    async def test_miss_params_middleware(self):
+        async def handle():
+            pass
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status == 500
+
+    async def test_ctx_throw(self):
+        async def handle(ctx: Context):
+            ctx.throw(401, {
+                'msg': 'error',
+            })
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status == 401
+        assert req.json()['msg'] == 'error'
+
+    async def test_ctx_raw_body(self):
+        async def handle(ctx: Context):
+            ctx.body = b'{"msg": "xxx"}'
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status == 200
+        assert req.json()['msg'] == 'xxx'
+
+    async def test_exception(self):
+        async def handle(ctx: Context):
+            raise Exception('err')
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status == 500

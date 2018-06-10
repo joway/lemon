@@ -6,6 +6,35 @@ from tests import BasicHttpTestCase
 
 @pytest.mark.asyncio
 class TestRouter(BasicHttpTestCase):
+    async def test_full_router(self):
+        async def single(ctx):
+            ctx.body = {
+                'app': 'single',
+            }
+
+        async def _all(ctx):
+            ctx.body = {
+                'app': 'all',
+            }
+
+        router = SimpleRouter()
+        router.get('/app', single)
+        router.put('/app', single)
+        router.post('/app', single)
+        router.delete('/app', single)
+
+        router.all('/all', _all)
+        self.app.use(router.routes())
+
+        req = await self.get('/app')
+        assert req.status_code == 200
+        req = await self.put('/app')
+        assert req.status_code == 200
+        req = await self.post('/app')
+        assert req.status_code == 200
+        req = await self.delete('/app')
+        assert req.status_code == 200
+
     async def test_sample_router(self):
         async def middleware(ctx, nxt):
             ctx.body = {'m': 'mid'}
@@ -18,6 +47,7 @@ class TestRouter(BasicHttpTestCase):
             ctx.body['app'] = 2
 
         router = SimpleRouter()
+        router.get('/app/handler1', middleware, handler1)
         router.get('/app/handler1', middleware, handler1)
         router.get('/app/handler2', middleware, handler2)
 

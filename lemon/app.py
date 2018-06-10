@@ -1,5 +1,6 @@
 import json
 import logging.config
+import traceback
 import typing
 from asyncio import get_event_loop
 from functools import partial
@@ -107,7 +108,7 @@ class Lemon:
                         ctx=ctx, middleware_list=middleware_chain
                     )
                 except Exception as e:
-                    logger.error(str(e))
+                    traceback.print_exc()
                     await send({
                         'type': 'http.response.start',
                         'status': 500,

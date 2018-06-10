@@ -15,6 +15,7 @@ class TestCors(BasicHttpTestCase):
             }
 
         self.app.use(handle)
+
         # GET
         req = await self.asgi_request(
             self.app,
@@ -58,8 +59,22 @@ class TestCors(BasicHttpTestCase):
             'LEMON_CORS_ORIGIN_WHITELIST': [
                 'http://a.com',
             ],
+            'LEMON_CORS_ORIGIN_REGEX_WHITELIST': [
+                'http://b.com',
+            ],
         }, debug=True)
         app.use(handle)
+
+        # EMPTY OPTIONS
+        req = await self.asgi_request(
+            app,
+            HTTP_METHODS.OPTIONS, '/',
+            headers=[
+                [b'origin', b'http://a.com'],
+            ]
+        )
+        assert req.status_code == 200
+        assert req.json()['ack'] == 'ok'
 
         req = await self.asgi_request(
             app,
@@ -74,6 +89,31 @@ class TestCors(BasicHttpTestCase):
         assert req.headers['access-control-allow-origin'] == 'http://a.com'
         assert req.headers['access-control-allow-methods'] == 'GET,POST'
         assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
+
+        req = await self.asgi_request(
+            app,
+            HTTP_METHODS.OPTIONS, '/',
+            headers=[
+                [b'origin', b'http://b.com'],
+                [b'access-control-request-method', b'POST'],
+                [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
+            ]
+        )
+        assert req.status_code == 204
+        assert req.headers['access-control-allow-origin'] == 'http://b.com'
+        assert req.headers['access-control-allow-methods'] == 'GET,POST'
+        assert req.headers['access-control-allow-headers'] == 'X-PINGOTHER, Content-Type'
+
+        req = await self.asgi_request(
+            app,
+            HTTP_METHODS.OPTIONS, '/',
+            headers=[
+                [b'origin', b'http://c.com'],
+                [b'access-control-request-method', b'POST'],
+                [b'access-control-request-headers', b'X-PINGOTHER, Content-Type'],
+            ]
+        )
+        assert req.status_code == 200
 
     async def test_cors_config(self):
         async def handle(ctx: Context):

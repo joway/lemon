@@ -40,9 +40,4 @@ class Response:
             _raw_body = self.body.encode()
         elif isinstance(self.body, bytes):
             _raw_body = self.body
-        else:
-            print(self.body)
-            print(type(self.body))
-            raise ResponseFormatError
-
         return _raw_body
