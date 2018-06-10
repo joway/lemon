@@ -21,6 +21,6 @@
   "pypi": {
     "enable": true,
     "build_cmd": "python setup.py sdist",
-    "upload_cmd": "twine upload dist/*"
+    "upload_cmd": "python setup.py upload"
   }
 }
