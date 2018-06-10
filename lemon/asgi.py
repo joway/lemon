@@ -1,5 +1,7 @@
 import typing
 
+from werkzeug.datastructures import ImmutableMultiDict
+
 from lemon.parsers import parse_http_body
 from lemon.request import Request, HttpHeaders
 
@@ -21,7 +23,7 @@ class ASGIRequest:
         http_headers = HttpHeaders(raw_headers=self.scope['headers'])
 
         # parse data
-        data = parse_http_body(headers=http_headers, body=body) if body else {}
+        data = parse_http_body(headers=http_headers, body=body) if body else ImmutableMultiDict()
 
         # create request
         return Request(

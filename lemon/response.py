@@ -32,7 +32,7 @@ class Response:
         return _raw_headers
 
     @property
-    def raw_body(self) -> dict:
+    def raw_body(self) -> bytes:
         _raw_body = b''
         if isinstance(self.body, dict):
             _raw_body = json.dumps(self.body).encode()

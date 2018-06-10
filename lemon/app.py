@@ -107,7 +107,7 @@ class Lemon:
                         ctx=ctx, middleware_list=middleware_chain
                     )
                 except Exception as e:
-                    logger.error(e)
+                    logger.error(str(e))
                     await send({
                         'type': 'http.response.start',
                         'status': 500,
