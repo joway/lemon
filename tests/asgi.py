@@ -96,11 +96,10 @@ class ASGIHttpTestCase:
     async def get(self, path, params=None):
         query_string = ''
         if params:
-            query_string = '?'
             params_pairs = []
             for p in params:
                 params_pairs.append('{0}={1}'.format(p, params[p]))
-            query_string += '&'.join(params)
+            query_string = '&'.join(params_pairs)
 
         return await self.asgi_request(
             app=self.app,

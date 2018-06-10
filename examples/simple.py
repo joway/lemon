@@ -4,7 +4,9 @@ from lemon.context import Context
 
 async def middleware(ctx: Context, nxt):
     ctx.body = {
-        'msg': 'hello world'
+        'msg': 'hello world',
+        'query': ctx.req.query,
+        'query_string': ctx.req.query_string,
     }
     await nxt()
 

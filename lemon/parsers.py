@@ -22,12 +22,12 @@ def get_content_length(headers: dict) -> typing.Optional[int]:
     if headers is None:
         raise exception.RequestHeadersParserError
     content_length = headers.get('content-length')
-    if content_length is not None:
-        try:
-            return max(0, int(content_length))
-        except (ValueError, TypeError):
-            pass
-    return None
+    if content_length is None:
+        return None
+    try:
+        return max(0, int(content_length))
+    except (ValueError, TypeError):
+        raise exception.RequestHeadersParserError
 
 
 def json_parser(body: bytes, *args) -> ImmutableMultiDict:
