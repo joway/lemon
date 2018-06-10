@@ -1,0 +1,26 @@
+{
+  "name": "lemon",
+  "version": "0.2.0",
+  "version_prefix": "",
+  "conditions": [],
+  "pre_release": [],
+  "git": {
+    "enable": true,
+    "remote": "origin"
+  },
+  "docker": {
+    "enable": false,
+    "namespace": "username/project_name",
+    "dkf_path": "./Dockerfile"
+  },
+  "npm": {
+    "enable": false,
+    "upgrade_version_enable": false,
+    "package_path": "./package.json"
+  },
+  "pypi": {
+    "enable": true,
+    "build_cmd": "python setup.py sdist",
+    "upload_cmd": "python setup.py upload"
+  }
+}
