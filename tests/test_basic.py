@@ -12,6 +12,8 @@ class TestBasicUsage(BasicHttpTestCase):
             ctx.body = {
                 'ack': 'yeah !',
             }
+
+            assert ctx.status == 201
             assert ctx.req.scheme == 'http'
             assert ctx.req.protocol == 'http'
             assert ctx.req.host == '127.0.0.1:9999'
@@ -220,3 +222,12 @@ class TestBasicUsage(BasicHttpTestCase):
         req = await self.get('/')
         assert req.status == 200
         assert req.json()['msg'] == 'xxx'
+
+    async def test_exception(self):
+        async def handle(ctx: Context):
+            raise Exception('err')
+
+        self.app.use(handle)
+
+        req = await self.get('/')
+        assert req.status == 500

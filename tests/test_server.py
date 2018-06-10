@@ -4,7 +4,6 @@ from time import sleep
 import requests
 
 from lemon.context import Context
-from lemon.server import serve
 from tests import BasicHttpTestCase
 
 

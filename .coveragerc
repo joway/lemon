@@ -6,3 +6,9 @@ omit =
 exclude_lines =
     pragma: no cover
     raise NotImplementedError
+    uvicorn.run(app, host=host, port=port)
+    logger.info(f'listen : http://{host}:{port}')
+    _host = host or settings.LEMON_SERVER_HOST
+    _port = port or settings.LEMON_SERVER_PORT
+    serve(self.application, _host, _port)
+
