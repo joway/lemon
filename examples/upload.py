@@ -4,8 +4,9 @@ from lemon.context import Context
 
 async def handle(ctx: Context):
     data = ctx.req.data
+    file = data['file_content']
     ctx.body = {
-        'file_content': data['file'].read().decode(),
+        'file_content': file.read().decode(),
     }
 
 
