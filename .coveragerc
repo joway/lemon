@@ -11,4 +11,3 @@ exclude_lines =
     _host = host or settings.LEMON_SERVER_HOST
     _port = port or settings.LEMON_SERVER_PORT
     serve(self.application, _host, _port)
-
