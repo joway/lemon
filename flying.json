@@ -1,6 +1,6 @@
 {
   "name": "lemon",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "version_prefix": "",
   "conditions": [],
   "pre_release": [],
@@ -20,7 +20,7 @@
   },
   "pypi": {
     "enable": true,
-    "build_cmd": "python setup.py sdist",
-    "upload_cmd": "python setup.py upload"
+    "build_cmd": "",
+    "upload_cmd": "python setup.py sdist upload"
   }
 }

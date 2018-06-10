@@ -1,6 +1,6 @@
 from setuptools import setup
 
-PACKAGE_VERSION = '0.2.0'
+PACKAGE_VERSION = '0.2.1'
 PACKAGE_REQUIRES = [
     'uvicorn==0.1.1',
     'kua==0.2',
@@ -32,5 +32,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
