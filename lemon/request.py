@@ -5,7 +5,6 @@ from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.http import parse_cookie
 
 from lemon.const import MIME_TYPES
-from lemon.parsers import parse_http_body
 
 
 class HttpHeaders(dict):
@@ -23,6 +22,14 @@ class HttpHeaders(dict):
 
     def set(self, key: str, value):
         return self.__setitem__(key, value)
+
+    def to_raw(self):
+        raw_headers = []
+        for k in self:
+            raw_headers.append([
+                k.encode(), self[k].encode(),
+            ])
+        return raw_headers
 
 
 class Request:
@@ -105,43 +112,3 @@ class Request:
     @property
     def cookies(self) -> dict:
         return parse_cookie(self.headers.get('cookie'))
-
-    @classmethod
-    async def read_body(cls, message, channels) -> bytes:
-        """
-        Read and return the entire body from an incoming ASGI message.
-        """
-        body = message.get('body', b'')
-        if 'body' in channels:
-            while True:
-                message_chunk = await channels['body'].receive()
-                body += message_chunk['content']
-                if not message_chunk.get('more_content', False):
-                    break
-        return body
-
-    @classmethod
-    async def from_asgi_interface(cls, message, channels) -> typing.Any:
-        body = await cls.read_body(message, channels)
-
-        # decode headers
-        http_headers = HttpHeaders()
-        for h in message['headers']:
-            http_headers[h[0].decode()] = h[1].decode()
-
-        # parse body
-        parsed_body = parse_http_body(headers=http_headers, body=body)
-
-        # create request
-        return Request(
-            http_version=message['http_version'],
-            method=message['method'],
-            scheme=message['scheme'],
-            path=message['path'],
-            query_string=message['query_string'].decode('utf-8'),
-            headers=http_headers,
-            body=body,
-            data=parsed_body,
-            client=message['client'],
-            server=message['server'],
-        )

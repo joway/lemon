@@ -69,7 +69,6 @@ DEFAULT_PARSERS_MAPPING: typing.Dict[str, typing.Callable] = {
 
 def parse_http_body(headers: dict, body: bytes) -> typing.Optional[ImmutableMultiDict]:
     content_type, _ = get_mimetype_and_options(headers=headers)
-    for parser_mimetype in DEFAULT_PARSERS_MAPPING:
-        if parser_mimetype == content_type:
-            return DEFAULT_PARSERS_MAPPING[parser_mimetype](body, headers)
-    return None
+    if content_type in DEFAULT_PARSERS_MAPPING:
+        return DEFAULT_PARSERS_MAPPING[content_type](body, headers)
+    return json_parser(body, headers)

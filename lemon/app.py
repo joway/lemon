@@ -5,13 +5,13 @@ from asyncio import get_event_loop
 from functools import partial
 from inspect import signature
 
+from lemon.asgi import ASGIRequest
 from lemon.config import settings
 from lemon.const import MIME_TYPES
 from lemon.context import Context
 from lemon.exception import MiddlewareParamsError
 from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
 from lemon.middleware import exception_middleware, cors_middleware
-from lemon.request import Request
 from lemon.server import serve
 
 LEMON_PRE_PROCESS_MIDDLEWARE: list = [
@@ -21,11 +21,12 @@ LEMON_PRE_PROCESS_MIDDLEWARE: list = [
 LEMON_POST_PROCESS_MIDDLEWARE: list = []
 
 
-async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0) -> typing.Any:
+async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0):
     """Exec middleware list
+
     :param ctx: Context instance
     :param middleware_list: middleware registered on app
-    :param pos: the position in middleware_list
+    :param pos: position of the middleware in list
     """
     if pos >= len(middleware_list):
         return
@@ -82,24 +83,20 @@ class Lemon:
 
     def use(self, *middleware) -> None:
         """Register middleware into app
-        :param middleware: the chain of the middleware
+        :param middleware: chain of the middleware
         """
         self.middleware_list.extend(middleware)
 
     @property
     def application(self) -> typing.Callable:
-        async def _wrapper(message: dict, channels: dict) -> typing.Any:
-            """
-            :param message: is an ASGI message.
-            :param channels: is a dictionary of
-            """
-            if message['channel'] == 'http.request':
+        def _make(scope: dict):
+            async def _call(receive: typing.Callable, send: typing.Callable):
                 # init context
                 ctx = Context()
+
                 # prepare request
-                ctx.req = await Request.from_asgi_interface(
-                    message=message, channels=channels
-                )
+                ctx.req = await ASGIRequest(scope)(receive, send)
+
                 middleware_chain = \
                     self.pre_process_middleware_list \
                     + self.middleware_list \
@@ -109,26 +106,35 @@ class Lemon:
                     await exec_middleware(
                         ctx=ctx, middleware_list=middleware_chain
                     )
-                except MiddlewareParamsError as e:
-                    return await channels['reply'].send({
+                except Exception as e:
+                    logger.error(e)
+                    await send({
+                        'type': 'http.response.start',
                         'status': 500,
-                        'headers': MIME_TYPES.APPLICATION_JSON,
-                        'content': json.dumps({
-                            'lemon': 'Your application middleware '
-                                     'has wrong num of params',
+                        'headers': [
+                            ['content-type', MIME_TYPES.APPLICATION_JSON, ]
+                        ],
+                    })
+                    await send({
+                        'type': 'http.response.body',
+                        'body': json.dumps({
+                            'lemon': 'Internal Error',
                         }).encode(),
                     })
                 else:
-                    return await channels['reply'].send(ctx.res.message)
-            # TODO: websocket support
-            elif message['channel'] == 'websocket.connect':
-                return None
-            elif message['channel'] == 'websocket.receive':
-                return None
-            elif message['channel'] == 'websocket.disconnect':
-                return None
+                    await send({
+                        'type': 'http.response.start',
+                        'status': ctx.res.status,
+                        'headers': ctx.res.raw_headers,
+                    })
+                    await send({
+                        'type': 'http.response.body',
+                        'body': ctx.res.raw_body,
+                    })
 
-        return _wrapper
+            return _call
+
+        return _make
 
     def listen(self, host: str = None, port: typing.Union[int, str] = None) -> None:
         """Running server with binding host:port

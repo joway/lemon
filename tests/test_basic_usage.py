@@ -50,7 +50,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
         self.app.use(handle)
         req = await self.post(path='/', data={
-            'hi': 'hello'
+            'hi': 'hello',
         })
         data = req.json()
         assert req.status_code == 200
@@ -68,7 +68,9 @@ class TestBasicUsage(BasicHttpTestCase):
             app=self.app,
             method='POST',
             path='/',
-            content_type=b'multipart/form-data; boundary=--------------------------927900071949197777043086',
+            headers=[
+                [b'content-type', b'multipart/form-data; boundary=--------------------------927900071949197777043086']
+            ],
             body=b'----------------------------927900071949197777043086\r\nContent-Disposition: form-data; '
                  b'name="xxx"; filename="avatar.jpg"\r\nContent-Type: '
                  b'image/jpeg\r\n\r\n' + 'xxx'.encode() + b'\r\n'

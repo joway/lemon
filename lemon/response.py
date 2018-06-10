@@ -8,41 +8,41 @@ from lemon.request import HttpHeaders
 class Response:
     def __init__(
             self, status: int = 200, headers: HttpHeaders = None,
-            body: str = None, content_type: str = MIME_TYPES.TEXT_PLAIN,
+            body: str = None, content_type: str = MIME_TYPES.APPLICATION_JSON,
             charset: str = CHARSETS.UTF8,
     ) -> None:
         self.status = status
         self.headers = headers if headers else HttpHeaders()
-        self.content_type = content_type
         self.body = body or ''
+        self.content_type = content_type
         self.charset = charset
 
     @property
-    def message(self) -> dict:
-        content = b''
-        if isinstance(self.body, dict):
-            self.content_type = MIME_TYPES.APPLICATION_JSON
-            content = json.dumps(self.body).encode()
-        elif isinstance(self.body, str):
-            content = self.body.encode()
-        elif isinstance(self.body, bytes):
-            content = self.body
-        else:
-            raise ResponseFormatError
-
+    def raw_content_type(self):
         content_type = '{type}; {charset}'.format(
             type=self.content_type, charset=self.charset
         )
-        header_pairs = [
-            [b'content-type', content_type.encode()],
-        ]
-        for h in self.headers:
-            header_pairs.append([
-                h.encode(),
-                self.headers[h].encode(),
-            ])
-        return {
-            'status': self.status,
-            'headers': header_pairs,
-            'content': content,
-        }
+        return [b'content-type', content_type.encode()]
+
+    @property
+    def raw_headers(self):
+        content_type_header = self.raw_content_type
+        _raw_headers = self.headers.to_raw()
+        _raw_headers.append(content_type_header)
+        return _raw_headers
+
+    @property
+    def raw_body(self) -> dict:
+        _raw_body = b''
+        if isinstance(self.body, dict):
+            _raw_body = json.dumps(self.body).encode()
+        elif isinstance(self.body, str):
+            _raw_body = self.body.encode()
+        elif isinstance(self.body, bytes):
+            _raw_body = self.body
+        else:
+            print(self.body)
+            print(type(self.body))
+            raise ResponseFormatError
+
+        return _raw_body

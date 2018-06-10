@@ -11,7 +11,7 @@ test:
 	pytest -qq
 
 lint:
-	pycodestyle --exclude docs/ --ignore E501
+	pycodestyle --exclude docs/,venv/ --ignore E501
 
 hint:
 	mypy lemon --ignore-missing-imports
