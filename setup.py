@@ -1,8 +1,8 @@
 from setuptools import setup
 
-PACKAGE_VERSION = '0.2.0'
+PACKAGE_VERSION = '0.2.2'
 PACKAGE_REQUIRES = [
-    'uvicorn==0.1.1',
+    'uvicorn==0.3.6',
     'kua==0.2',
     'werkzeug==0.14.1',
 ]

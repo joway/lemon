@@ -73,7 +73,7 @@ class TestRouter(BasicHttpTestCase):
         req = await self.get('/app/xxx/')
         data = req.json()
         assert req.status_code == 404
-        assert data['lemon'] == 'NOT FOUND'
+        assert data['error'] == 'not found'
 
     async def test_router_example(self):
         async def middleware(ctx, nxt):
@@ -112,51 +112,111 @@ class TestRouter(BasicHttpTestCase):
         req = await self.get('/app/xxx/')
         data = req.json()
         assert req.status_code == 404
-        assert data['lemon'] == 'NOT FOUND'
+        assert data['error'] == 'not found'
+    #
+    # async def test_router_register(self):
+    #     async def middleware(ctx, nxt):
+    #         ctx.body = {'m': 2}
+    #         await nxt
+    #
+    #     async def handler(ctx):
+    #         ctx.body = {'x': 1}
+    #
+    #     router = Router()
+    #     router._register_middleware_list(
+    #         'GET', '/res/action', middleware, handler
+    #     )
+    #
+    # async def test_rest_router_register(self):
+    #     async def handler(ctx):
+    #         ctx.body = {'x': 1}
+    #
+    #     router = Router()
+    #     router._register_middleware_list('GET', '/res/:id/action', handler)
+    #
+    #     route = router._match_middleware_list('GET', '/res/xxx/action')
+    #     assert route is not None
+    #     assert route.params['id'] == 'xxx'
+    #     assert len(route.anything) == 1
+    #
+    #     route = router._match_middleware_list('GET', '/res/:id/action')
+    #     assert route is not None
+    #     assert route.params['id'] == ':id'
+    #     assert len(route.anything) == 1
+    #
+    #     route = router._match_middleware_list('GET', '/re/:id/action')
+    #     assert route is None
+    #
+    #     route = router._match_middleware_list('GET', '/res/:id/actions')
+    #     assert route is None
 
-    async def test_router_register(self):
-        async def middleware(ctx, nxt):
-            ctx.body = {'m': 2}
-            await nxt
+    async def test_router_exec(self):
+        global before_count
+        global after_count
+        global handler_count
+        global orders
 
-        async def handler(ctx):
-            ctx.body = {'x': 1}
+        before_count = 0
+        after_count = 0
+        handler_count = 0
+        orders = []
+
+        async def before(ctx, nxt):
+            ctx.body = {'count': 1}
+            global before_count
+            global orders
+            orders.append(0)
+            before_count += 1
+            await nxt()
+
+        async def handler1(ctx, nxt):
+            ctx.body['count'] += 1
+            global handler_count
+            global orders
+            orders.append(1)
+            handler_count += 1
+            await nxt()
+
+        async def handler2(ctx, nxt):
+            ctx.body['count'] += 1
+            global handler_count
+            global orders
+            orders.append(2)
+            handler_count += 1
+            await nxt()
+
+        async def handler3(ctx, nxt):
+            ctx.body['count'] += 1
+            global handler_count
+            global orders
+            orders.append(3)
+            handler_count += 1
+            await nxt()
+
+        async def after(ctx):
+            global after_count
+            global orders
+            orders.append(4)
+            after_count += 1
+            ctx.body['count'] += 1
 
         router = Router()
-        router._register_middleware_list(
-            'GET', '/res/action', middleware, handler
-        )
+        router.get('/', handler1, handler2, handler3)
 
-        route = router._match_middleware_list('GET', '/res')
-        assert route is None
+        self.app.use(before)
+        self.app.use(router.routes())
+        self.app.use(after)
 
-        route = router._match_middleware_list('GET', '/res/action/')
-        assert route is not None
-        assert len(route.anything) == 2
+        req = await self.get('/')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['count'] == 5
+        assert before_count == 1
+        assert after_count == 1
+        assert handler_count == 3
 
-        route = router._match_middleware_list('GET', '/res/action')
-        assert route is not None
-        assert len(route.anything) == 2
-
-    async def test_rest_router_register(self):
-        async def handler(ctx):
-            ctx.body = {'x': 1}
-
-        router = Router()
-        router._register_middleware_list('GET', '/res/:id/action', handler)
-
-        route = router._match_middleware_list('GET', '/res/xxx/action')
-        assert route is not None
-        assert route.params['id'] == 'xxx'
-        assert len(route.anything) == 1
-
-        route = router._match_middleware_list('GET', '/res/:id/action')
-        assert route is not None
-        assert route.params['id'] == ':id'
-        assert len(route.anything) == 1
-
-        route = router._match_middleware_list('GET', '/re/:id/action')
-        assert route is None
-
-        route = router._match_middleware_list('GET', '/res/:id/actions')
-        assert route is None
+        assert orders[0] == 0
+        assert orders[1] == 1
+        assert orders[2] == 2
+        assert orders[3] == 3
+        assert orders[4] == 4

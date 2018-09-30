@@ -1,4 +1,4 @@
-from lemon.exception import RequestHeadersParserError, BadRequestError
+from lemon.exception import RequestHeadersParserError, RequestBadError
 from lemon.parsers import get_content_length, json_parser, url_encoded_parser
 from tests import BasicHttpTestCase
 
@@ -23,13 +23,13 @@ class TestParser(BasicHttpTestCase):
         try:
             json_parser(None)
             assert False
-        except BadRequestError:
+        except RequestBadError:
             pass
 
         try:
             json_parser(b'{')
             assert False
-        except BadRequestError:
+        except RequestBadError:
             pass
 
     def test_url_encoded_parser(self):

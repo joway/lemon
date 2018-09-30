@@ -7,8 +7,8 @@ from werkzeug.formparser import FormDataParser
 from werkzeug.http import parse_options_header
 from werkzeug.urls import url_decode
 
-import lemon.exception as exception
 from lemon.const import MIME_TYPES
+from lemon.exception import RequestHeadersParserError, RequestBodyParserError
 
 
 def get_mimetype_and_options(headers: dict) -> typing.Tuple[str, dict]:
@@ -20,27 +20,23 @@ def get_mimetype_and_options(headers: dict) -> typing.Tuple[str, dict]:
 
 def get_content_length(headers: dict) -> typing.Optional[int]:
     if headers is None:
-        raise exception.RequestHeadersParserError
+        raise RequestHeadersParserError
     content_length = headers.get('content-length')
     if content_length is None:
         return None
     try:
         return max(0, int(content_length))
     except (ValueError, TypeError):
-        raise exception.RequestHeadersParserError
+        raise RequestHeadersParserError
 
 
 def json_parser(body: bytes, *args) -> ImmutableMultiDict:
     if not body:
-        raise exception.BadRequestError(body={
-            'error': 'Empty Body',
-        })
+        raise RequestBodyParserError
     try:
         return ImmutableMultiDict(json.loads(body.decode('utf-8')))
     except json.JSONDecodeError:
-        raise exception.BadRequestError(body={
-            'error': 'Invalid JSON',
-        })
+        raise RequestBodyParserError
 
 
 def url_encoded_parser(body: bytes, *args) -> dict:

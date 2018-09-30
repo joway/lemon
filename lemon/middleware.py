@@ -18,7 +18,7 @@ async def exception_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any
         traceback.print_exc()
         ctx.status = 500
         ctx.body = ctx.body or {
-            'lemon': 'INTERNAL ERROR',
+            'error': 'unknown error',
         }
 
 

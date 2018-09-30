@@ -14,4 +14,4 @@ class TestMiddleware(BasicHttpTestCase):
         req = await self.get('/')
         data = req.json()
         assert req.status_code == 500
-        assert data['lemon'] == 'INTERNAL ERROR'
+        assert data['error'] == 'unknown error'

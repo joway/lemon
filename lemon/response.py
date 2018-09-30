@@ -1,7 +1,7 @@
 import json
 
 from lemon.const import MIME_TYPES, CHARSETS
-from lemon.exception import ResponseFormatError
+from lemon.exception import LemonResponseFormatError
 from lemon.request import HttpHeaders
 
 

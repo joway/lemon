@@ -1,7 +1,7 @@
 from lemon.exception import (
-    MiddlewareParamsError,
-    RouterRegisterError,
-    RouterMatchError,
+    LemonMiddlewareParamsError,
+    LemonRouterRegisterError,
+    LemonRouterMatchError,
     RequestBodyParserError,
     GeneralException
 )
@@ -18,23 +18,23 @@ class TestException(BasicHttpTestCase):
             assert e.body == 'err'
 
         try:
-            raise MiddlewareParamsError
+            raise LemonMiddlewareParamsError
         except GeneralException as e:
             assert e.status == 500
 
         try:
-            raise MiddlewareParamsError
-        except MiddlewareParamsError as e:
+            raise LemonMiddlewareParamsError
+        except LemonMiddlewareParamsError as e:
             assert e.status == 500
 
         try:
-            raise RouterRegisterError
-        except RouterRegisterError as e:
+            raise LemonRouterRegisterError
+        except LemonRouterRegisterError as e:
             assert e.status == 500
 
         try:
-            raise RouterMatchError
-        except RouterMatchError as e:
+            raise LemonRouterMatchError
+        except LemonRouterMatchError as e:
             assert e.status == 500
 
         try:
