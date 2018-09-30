@@ -1,4 +1,3 @@
-# ==========   GeneralException  ==========
 import typing
 
 
@@ -8,43 +7,62 @@ class GeneralException(BaseException):
         self.body = body
 
 
-# ==========   RuntimeError - 500  ==========
+# ==========   RequestException 4xx  ==========
+class RequestBadError(GeneralException):
+    def __init__(self):
+        super().__init__(status=400, body={
+            'error': 'bad request'
+        })
+
+
+class RequestUnauthorizedError(GeneralException):
+    def __init__(self):
+        super().__init__(status=401, body={
+            'error': 'unauthorized'
+        })
+
+
+class RequestForbiddenError(GeneralException):
+    def __init__(self):
+        super().__init__(status=403, body={
+            'error': 'not found'
+        })
+
+
+class RequestNotFoundError(GeneralException):
+    def __init__(self):
+        super().__init__(status=404, body={
+            'error': 'not found'
+        })
+
+
+class RequestHeadersParserError(RequestBadError):
+    pass
+
+
+class RequestBodyParserError(RequestBadError):
+    pass
+
+
+# ==========   RuntimeError - 5xx  ==========
 class ServerError(GeneralException):
-    def __init__(self, *args, **kwargs) -> None:
-        super(ServerError, self).__init__(*args, **kwargs)
-        self.status = 500
+    def __init__(self):
+        super().__init__(status=500, body={
+            'error': 'internal error'
+        })
 
 
-class MiddlewareParamsError(ServerError):
+class LemonMiddlewareParamsError(ServerError):
     pass
 
 
-class RouterRegisterError(ServerError):
+class LemonRouterRegisterError(ServerError):
     pass
 
 
-class RouterMatchError(ServerError):
-    pass
-
-
-class ResponseFormatError(ServerError):
+class LemonRouterMatchError(ServerError):
     pass
 
 
 class LemonConfigKeyError(ServerError):
-    pass
-
-
-# ==========   BadRequestError - 400  ==========
-class BadRequestError(GeneralException):
-    def __init__(self, *args, **kwargs) -> None:
-        super(BadRequestError, self).__init__(*args, **kwargs)
-        self.status = 400
-
-
-class RequestHeadersParserError(BadRequestError):
-    pass
-
-
-class RequestBodyParserError(BadRequestError):
     pass

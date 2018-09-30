@@ -1,6 +1,4 @@
-import json
 import logging.config
-import traceback
 import typing
 from asyncio import get_event_loop
 from functools import partial
@@ -8,9 +6,8 @@ from inspect import signature
 
 from lemon.asgi import ASGIRequest
 from lemon.config import settings
-from lemon.const import MIME_TYPES
 from lemon.context import Context
-from lemon.exception import MiddlewareParamsError
+from lemon.exception import LemonMiddlewareParamsError
 from lemon.log import LOGGING_CONFIG_DEFAULTS, logger
 from lemon.middleware import exception_middleware, cors_middleware
 from lemon.server import serve
@@ -27,37 +24,27 @@ async def exec_middleware(ctx: Context, middleware_list: list, pos: int = 0):
 
     :param ctx: Context instance
     :param middleware_list: middleware registered on app
-    :param pos: position of the middleware in list
+    :param pos: current pos in middleware_list
     """
     if pos >= len(middleware_list):
         return
 
     middleware = middleware_list[pos]
     logger.debug(
-        'The No.{0} middleware : {1} started'.format(
-            pos,
-            middleware.__name__,
-        )
+        'middleware : %s started',
+        middleware.__name__,
     )
 
-    try:
-        middleware_params = signature(middleware).parameters
-        if len(middleware_params) == 1:
-            return await middleware(ctx=ctx)
-        elif len(middleware_params) == 2:
-            return await middleware(
-                ctx=ctx,
-                nxt=partial(exec_middleware, ctx, middleware_list, pos + 1),
-            )
-        else:
-            raise MiddlewareParamsError
-    finally:
-        logger.debug(
-            'The No.{0} middleware : {1} finished'.format(
-                pos,
-                middleware.__name__,
-            )
+    middleware_params = signature(middleware).parameters
+    if len(middleware_params) == 1:
+        await middleware(ctx=ctx)
+    elif len(middleware_params) == 2:
+        return await middleware(
+            ctx=ctx,
+            nxt=partial(exec_middleware, ctx, middleware_list, pos + 1),
         )
+    else:
+        raise LemonMiddlewareParamsError
 
 
 class Lemon:
@@ -66,8 +53,7 @@ class Lemon:
         :param config: app config
         :param debug: if debug == True , set log level to DEBUG , else is INFO
         """
-        self.config = config
-        settings.set_config(config=config)
+        settings.set_config(config=config or {})
 
         self.middleware_list: list = []
 
@@ -103,35 +89,19 @@ class Lemon:
                     + self.middleware_list \
                     + self.post_process_middleware_list
 
-                try:
-                    await exec_middleware(
-                        ctx=ctx, middleware_list=middleware_chain
-                    )
-                except Exception as e:
-                    traceback.print_exc()
-                    await send({
-                        'type': 'http.response.start',
-                        'status': 500,
-                        'headers': [
-                            ['content-type', MIME_TYPES.APPLICATION_JSON, ]
-                        ],
-                    })
-                    await send({
-                        'type': 'http.response.body',
-                        'body': json.dumps({
-                            'lemon': 'Internal Error',
-                        }).encode(),
-                    })
-                else:
-                    await send({
-                        'type': 'http.response.start',
-                        'status': ctx.res.status,
-                        'headers': ctx.res.raw_headers,
-                    })
-                    await send({
-                        'type': 'http.response.body',
-                        'body': ctx.res.raw_body,
-                    })
+                await exec_middleware(
+                    ctx=ctx, middleware_list=middleware_chain,
+                )
+
+                await send({
+                    'type': 'http.response.start',
+                    'status': ctx.res.status,
+                    'headers': ctx.res.raw_headers,
+                })
+                await send({
+                    'type': 'http.response.body',
+                    'body': ctx.res.raw_body,
+                })
 
             return _call
 

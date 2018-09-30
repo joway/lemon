@@ -21,7 +21,7 @@ class Context:
         # alias
         if key == 'body':
             self.res.body = value
-        if key == 'status':
+        elif key == 'status':
             self.res.status = value
         else:
             self.__dict__[key] = value
@@ -30,7 +30,7 @@ class Context:
         # alias
         if item == 'body':
             return self.res.body
-        if item == 'status':
+        elif item == 'status':
             return self.res.status
         return self.__dict__[item]
 
