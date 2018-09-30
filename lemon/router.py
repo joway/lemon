@@ -1,6 +1,5 @@
 import typing
 from abc import ABCMeta, abstractmethod
-from copy import deepcopy
 
 import kua
 
