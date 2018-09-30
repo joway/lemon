@@ -14,12 +14,14 @@ async def exception_middleware(ctx: Context, nxt: typing.Callable) -> typing.Any
     except GeneralException as e:
         ctx.body = e.body
         ctx.status = e.status
+        if settings.LEMON_DEBUG:
+            traceback.print_exc()
     except Exception as e:
-        traceback.print_exc()
         ctx.status = 500
         ctx.body = ctx.body or {
             'error': 'unknown error',
         }
+        traceback.print_exc()
 
 
 async def cors_middleware(ctx: Context, nxt: typing.Callable):

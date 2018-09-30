@@ -152,6 +152,7 @@ class TestCors(BasicHttpTestCase):
         assert req.headers['access-control-allow-headers'] == 'allow_header'
         assert req.headers['access-control-allow-credentials'] == 'true'
         assert req.headers['access-control-max-age'] == '8640'
+        assert req.status == 204
 
         req = await self.asgi_request(
             app,
@@ -164,6 +165,7 @@ class TestCors(BasicHttpTestCase):
         assert req.headers['access-control-allow-origin'] == 'http://a.com'
         assert req.headers['access-control-allow-credentials'] == 'true'
         assert req.headers['access-control-expose-headers'] == 'test_header'
+        assert req.status == 200
 
     async def test_cors_not_allowed_request(self):
         async def handle(ctx: Context):
@@ -190,3 +192,4 @@ class TestCors(BasicHttpTestCase):
             ]
         )
         assert 'access-control-allow-origin' not in req.headers
+        assert req.status == 200

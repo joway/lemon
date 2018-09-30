@@ -53,8 +53,7 @@ class Lemon:
         :param config: app config
         :param debug: if debug == True , set log level to DEBUG , else is INFO
         """
-        self.config = config
-        settings.set_config(config=config)
+        settings.set_config(config=config or {})
 
         self.middleware_list: list = []
 
