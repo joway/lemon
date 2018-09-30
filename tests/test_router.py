@@ -75,7 +75,7 @@ class TestRouter(BasicHttpTestCase):
         assert req.status_code == 404
         assert data['error'] == 'not found'
 
-    async def test_router_example(self):
+    async def test_router(self):
         async def middleware(ctx, nxt):
             ctx.body = {'m': 'mid'}
             await nxt()
@@ -113,44 +113,25 @@ class TestRouter(BasicHttpTestCase):
         data = req.json()
         assert req.status_code == 404
         assert data['error'] == 'not found'
-    #
-    # async def test_router_register(self):
-    #     async def middleware(ctx, nxt):
-    #         ctx.body = {'m': 2}
-    #         await nxt
-    #
-    #     async def handler(ctx):
-    #         ctx.body = {'x': 1}
-    #
-    #     router = Router()
-    #     router._register_middleware_list(
-    #         'GET', '/res/action', middleware, handler
-    #     )
-    #
-    # async def test_rest_router_register(self):
-    #     async def handler(ctx):
-    #         ctx.body = {'x': 1}
-    #
-    #     router = Router()
-    #     router._register_middleware_list('GET', '/res/:id/action', handler)
-    #
-    #     route = router._match_middleware_list('GET', '/res/xxx/action')
-    #     assert route is not None
-    #     assert route.params['id'] == 'xxx'
-    #     assert len(route.anything) == 1
-    #
-    #     route = router._match_middleware_list('GET', '/res/:id/action')
-    #     assert route is not None
-    #     assert route.params['id'] == ':id'
-    #     assert len(route.anything) == 1
-    #
-    #     route = router._match_middleware_list('GET', '/re/:id/action')
-    #     assert route is None
-    #
-    #     route = router._match_middleware_list('GET', '/res/:id/actions')
-    #     assert route is None
 
-    async def test_router_exec(self):
+    async def test_router_restful(self):
+        async def handler1(ctx):
+            assert ctx.params['id'] == 'idxxx'
+            assert ctx.params['username'] == 'namexxx'
+            ctx.body = {
+                'msg': 'ok'
+            }
+
+        router = Router()
+        router.get('/app/:id/:username', handler1)
+
+        self.app.use(router.routes())
+        req = await self.get('/app/idxxx/namexxx')
+        data = req.json()
+        assert req.status_code == 200
+        assert data['msg'] == 'ok'
+
+    async def test_router_exec_order(self):
         global before_count
         global after_count
         global handler_count
