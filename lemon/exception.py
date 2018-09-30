@@ -64,9 +64,5 @@ class LemonRouterMatchError(ServerError):
     pass
 
 
-class LemonResponseFormatError(ServerError):
-    pass
-
-
 class LemonConfigKeyError(ServerError):
     pass
