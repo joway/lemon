@@ -99,7 +99,7 @@ class Request:
         return self._query
 
     @property
-    def form(self) -> ImmutableMultiDict:
+    def form(self) -> typing.Optional[ImmutableMultiDict]:
         return self.data
 
     @property

@@ -14,7 +14,7 @@ from lemon.exception import RequestHeadersParserError, RequestBodyParserError
 def get_mimetype_and_options(headers: dict) -> typing.Tuple[str, dict]:
     content_type = headers.get('content-type')
     if content_type:
-        return parse_options_header(content_type)
+        return typing.cast(typing.Tuple[str, dict], parse_options_header(content_type))
     return '', {}
 
 
@@ -43,7 +43,7 @@ def url_encoded_parser(body: bytes, *args) -> dict:
     return url_decode(body, cls=ImmutableMultiDict)
 
 
-def multi_part_parser(body: bytes, headers: dict = None) -> ImmutableMultiDict:
+def multi_part_parser(body: bytes, headers: dict = {}) -> ImmutableMultiDict:
     mimetype, options = get_mimetype_and_options(headers)
     content_length = get_content_length(headers)
     parser = FormDataParser()

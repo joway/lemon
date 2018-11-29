@@ -34,6 +34,9 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
     LEMON_CORS_ALLOW_CREDENTIALS = settings.LEMON_CORS_ALLOW_CREDENTIALS
     LEMON_CORS_MAX_AGE = settings.LEMON_CORS_MAX_AGE
 
+    if ctx.req is None:
+        return
+
     headers = ctx.req.headers
     origin = headers.get('origin', None)
 

@@ -11,11 +11,11 @@ class Context:
     """
 
     def __init__(self) -> None:
-        self.req: Request = None
+        self.req: typing.Optional[Request] = None
         self.res: Response = Response()
         # store middleware communication message
         self.state: dict = {}
-        self.params: dict = None
+        self.params: typing.Optional[dict] = None
 
     def __setattr__(self, key, value) -> None:
         # alias
