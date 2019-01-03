@@ -39,7 +39,7 @@ jobs:
           command: |
             . venv/bin/activate
             coverage run --source=lemon setup.py test
-            [[ $COVERALLS == true ]] && coveralls
+            [[ $COVERALLS == true ]] && coveralls || true
   test-3.7:
     <<: *test-template
     docker:
