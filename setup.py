@@ -1,12 +1,12 @@
 from setuptools import setup
 
-PACKAGE_VERSION = '0.2.2'
+PACKAGE_VERSION = '0.3.0'
 PACKAGE_REQUIRES = [
     'uvicorn==0.3.24',
     'kua==0.2',
     'werkzeug==0.14.1',
 ]
-DEVELOPMENT_STATUS = '4 - Beta'
+DEVELOPMENT_STATUS = '5 - Production/Stable'
 
 setup(
     name='pylemon',
