@@ -32,15 +32,15 @@ jobs:
             mypy lemon --ignore-missing-imports
             pycodestyle --exclude pycodestyle --exclude .svn,CVS,.bzr,.hg,.git,__pycache__,.tox,docs,.eggs  --ignore E501
       - run:
-          name: Run fossa
-          command: |
-            fossa init
-            fossa analyze
-      - run:
           name: Run tests
           command: |
             coverage run --source=lemon setup.py test
             coveralls
+      - run:
+          name: Run fossa
+          command: |
+            fossa init
+            fossa analyze
   test-3.7:
     <<: *test-template
     docker:
