@@ -1,0 +1,47 @@
+version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test-3.6
+      - test-3.7
+jobs:
+  test-3.6: &test-template
+    context: fossa
+    docker:
+      - image: circleci/python:3.6
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "setup.py" }}
+          - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: |
+           pip install -r requirements.txt
+           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "setup.py" }}
+      - run:
+          name: Run check
+          command: |
+            mypy lemon --ignore-missing-imports
+            pycodestyle --exclude pycodestyle --exclude .svn,CVS,.bzr,.hg,.git,__pycache__,.tox,docs,.eggs  --ignore E501
+      - run:
+          name: Run fossa
+          command: |
+            fossa init
+            fossa analyze
+      - run:
+          name: Run tests
+          command: |
+            coverage run --source=lemon setup.py test
+            coveralls
+  test-3.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
