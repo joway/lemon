@@ -9,6 +9,8 @@ jobs:
   test-3.6: &test-template
     docker:
       - image: circleci/python:3.6
+    environment:
+      COVERALLS: true
     working_directory: ~/repo
     steps:
       - checkout
@@ -37,11 +39,10 @@ jobs:
           command: |
             . venv/bin/activate
             coverage run --source=lemon setup.py test
-            coveralls
+            [[ $COVERALLS -eq true ]] || { coveralls }
   test-3.7:
     <<: *test-template
     docker:
       - image: circleci/python:3.7
-notify:
-  webhooks:
-    - url: http://app.fossa.io/hooks/circleci
+    environment:
+      COVERALLS: false
