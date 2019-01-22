@@ -1,5 +1,5 @@
 # production
-uvicorn==0.3.25
+uvicorn==0.3.30
 kua==0.2
 werkzeug==0.14.1
 
