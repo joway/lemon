@@ -3,6 +3,7 @@ workflows:
   version: 2
   test:
     jobs:
+      - test-3.5
       - test-3.6
       - test-3.7
 jobs:
@@ -40,6 +41,12 @@ jobs:
             . venv/bin/activate
             coverage run --source=lemon setup.py test
             [[ $COVERALLS == true ]] && coveralls || true
+  test-3.5:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.5
+    environment:
+      COVERALLS: false
   test-3.7:
     <<: *test-template
     docker:
