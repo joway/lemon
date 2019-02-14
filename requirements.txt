@@ -5,7 +5,7 @@ werkzeug==0.14.1
 
 # dev
 pytest==4.2.1
-pytest-runner==4.2
+pytest-runner==4.4
 pytest-asyncio==0.10.0
 coveralls==1.5.1
 pycodestyle==2.5.0
