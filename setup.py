@@ -4,7 +4,7 @@ PACKAGE_VERSION = '0.3.1'
 PACKAGE_REQUIRES = [
     'uvicorn==0.3.32',
     'kua==0.2',
-    'werkzeug==0.14.1',
+    'werkzeug==0.15.0',
 ]
 DEVELOPMENT_STATUS = '5 - Production/Stable'
 
