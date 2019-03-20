@@ -7,7 +7,7 @@ werkzeug==0.15.0
 pytest==4.3.1
 pytest-runner==4.4
 pytest-asyncio==0.10.0
-coveralls==1.6.0
+coveralls==1.7.0
 pycodestyle==2.5.0
 sphinx-rtd-theme==0.4.3
 sphinx==1.8.5
