@@ -14,4 +14,4 @@ def serve(app: typing.Callable, host: str, port: typing.Union[int, str]) -> None
     :param port: eg: 9999
     """
     logger.info(f'listen : http://{host}:{port}')
-    uvicorn.run(app=app, host=host, port=int(port), disable_lifespan=True)
+    uvicorn.run(app=app, host=host, port=int(port))
