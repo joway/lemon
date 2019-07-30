@@ -28,6 +28,7 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
     # settings
     LEMON_CORS_ORIGIN_WHITELIST = settings.LEMON_CORS_ORIGIN_WHITELIST
     LEMON_CORS_ORIGIN_REGEX_WHITELIST = settings.LEMON_CORS_ORIGIN_REGEX_WHITELIST
+    LEMON_CORS_ORIGIN_ALLOW_ALL = settings.LEMON_CORS_ORIGIN_ALLOW_ALL
     LEMON_CORS_ALLOW_METHODS = settings.LEMON_CORS_ALLOW_METHODS
     LEMON_CORS_ALLOW_HEADERS = settings.LEMON_CORS_ALLOW_HEADERS
     LEMON_CORS_EXPOSE_HEADERS = settings.LEMON_CORS_EXPOSE_HEADERS
@@ -75,7 +76,10 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
         return
 
     # cross origin request
-    ctx.res.headers['access-control-allow-origin'] = origin
+    if LEMON_CORS_ORIGIN_ALLOW_ALL:
+        ctx.res.headers['access-control-allow-origin'] = '*'
+    else:
+        ctx.res.headers['access-control-allow-origin'] = origin
     if LEMON_CORS_ALLOW_CREDENTIALS:
         ctx.res.headers['access-control-allow-credentials'] = 'true'
     if LEMON_CORS_EXPOSE_HEADERS:
