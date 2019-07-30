@@ -40,10 +40,14 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
 
     headers = ctx.req.headers
     origin = headers.get('origin', None)
+    origin_header = origin
 
     # pass request
     if origin is None:
         return await nxt()
+
+    if LEMON_CORS_ORIGIN_ALLOW_ALL:
+        origin_header = '*'
 
     # preflight request
     if ctx.req.method == 'OPTIONS':
@@ -53,17 +57,20 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
             return await nxt()
 
         matched = False
-        for domain in LEMON_CORS_ORIGIN_WHITELIST:
-            if domain == origin:
-                matched = True
-        for domain_pattern in LEMON_CORS_ORIGIN_REGEX_WHITELIST:
-            if re.match(domain_pattern, origin):
-                matched = True
+        if LEMON_CORS_ORIGIN_ALLOW_ALL:
+            matched = True
+        else:
+            for domain in LEMON_CORS_ORIGIN_WHITELIST:
+                if domain == origin:
+                    matched = True
+            for domain_pattern in LEMON_CORS_ORIGIN_REGEX_WHITELIST:
+                if re.match(domain_pattern, origin):
+                    matched = True
         if matched is False:
             ctx.status = 200
             return
 
-        ctx.res.headers['access-control-allow-origin'] = origin
+        ctx.res.headers['access-control-allow-origin'] = origin_header
 
         if LEMON_CORS_ALLOW_CREDENTIALS:
             ctx.res.headers['access-control-allow-credentials'] = 'true'
@@ -76,10 +83,7 @@ async def cors_middleware(ctx: Context, nxt: typing.Callable):
         return
 
     # cross origin request
-    if LEMON_CORS_ORIGIN_ALLOW_ALL:
-        ctx.res.headers['access-control-allow-origin'] = '*'
-    else:
-        ctx.res.headers['access-control-allow-origin'] = origin
+    ctx.res.headers['access-control-allow-origin'] = origin_header
     if LEMON_CORS_ALLOW_CREDENTIALS:
         ctx.res.headers['access-control-allow-credentials'] = 'true'
     if LEMON_CORS_EXPOSE_HEADERS:
