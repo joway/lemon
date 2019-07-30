@@ -107,7 +107,8 @@ class Request:
         """Transform request body to dict when content_type is 'application/json'
         :return: dict
         """
-        return self.data.to_dict(flat=True) if self.data else None
+        d = self.data.to_dict(flat=False)
+        return {k: d[k][0] if len(d[k]) <= 1 else d[k] for k in d.keys()}
 
     @property
     def cookies(self) -> dict:

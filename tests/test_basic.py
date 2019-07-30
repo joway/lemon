@@ -43,13 +43,16 @@ class TestBasicUsage(BasicHttpTestCase):
             ctx.body = ctx.req.json
             assert ctx.req.form['int'] == 1
             assert ctx.req.form['str'] == 'xxx'
-            assert ctx.req.data['str'] == 'xxx'
-            assert ctx.req.data['str'] == 'xxx'
+            assert ctx.req.json['int'] == 1
+            assert ctx.req.json['str'] == 'xxx'
+            assert ctx.req.json['list'][0] == 'item1'
+            assert ctx.req.json['list'][1] == 'item2'
 
         self.app.use(handle)
         req = await self.post('/', data={
             'int': 1,
-            'str': 'xxx'
+            'str': 'xxx',
+            'list': ['item1', 'item2'],
         })
         assert req.status_code == 200
         data = req.json()

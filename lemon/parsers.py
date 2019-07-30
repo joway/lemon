@@ -39,7 +39,7 @@ def json_parser(body: bytes, *args) -> ImmutableMultiDict:
         raise RequestBodyParserError
 
 
-def url_encoded_parser(body: bytes, *args) -> dict:
+def url_encoded_parser(body: bytes, *args) -> ImmutableMultiDict:
     return url_decode(body, cls=ImmutableMultiDict)
 
 
