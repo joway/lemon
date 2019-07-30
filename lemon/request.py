@@ -48,7 +48,7 @@ class Request:
             query_string: bytes,
             headers: HttpHeaders,
             body: bytes,
-            data: typing.Optional[ImmutableMultiDict],
+            data: typing.Optional[typing.Dict],
             client: tuple,
             server: tuple,
     ) -> None:
@@ -101,14 +101,6 @@ class Request:
     @property
     def form(self) -> typing.Optional[ImmutableMultiDict]:
         return self.data
-
-    @property
-    def json(self) -> dict:
-        """Transform request body to dict when content_type is 'application/json'
-        :return: dict
-        """
-        d = self.data.to_dict(flat=False)
-        return {k: d[k][0] if len(d[k]) <= 1 else d[k] for k in d.keys()}
 
     @property
     def cookies(self) -> dict:

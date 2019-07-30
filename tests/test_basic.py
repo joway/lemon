@@ -40,19 +40,21 @@ class TestBasicUsage(BasicHttpTestCase):
 
     async def test_post_json(self):
         async def handle(ctx: Context):
-            ctx.body = ctx.req.json
+            ctx.body = ctx.req.data
             assert ctx.req.form['int'] == 1
             assert ctx.req.form['str'] == 'xxx'
-            assert ctx.req.json['int'] == 1
-            assert ctx.req.json['str'] == 'xxx'
-            assert ctx.req.json['list'][0] == 'item1'
-            assert ctx.req.json['list'][1] == 'item2'
+            assert ctx.req.data['int'] == 1
+            assert ctx.req.data['str'] == 'xxx'
+            assert ctx.req.data['list'][0] == 'item1'
+            assert ctx.req.data['list'][1] == 'item2'
+            assert ctx.req.data['list1'][0] == 'item1'
 
         self.app.use(handle)
         req = await self.post('/', data={
             'int': 1,
             'str': 'xxx',
             'list': ['item1', 'item2'],
+            'list1': ['item1'],
         })
         assert req.status_code == 200
         data = req.json()
@@ -61,7 +63,7 @@ class TestBasicUsage(BasicHttpTestCase):
 
     async def test_post_form(self):
         async def handle(ctx: Context):
-            data = ctx.req.json
+            data = ctx.req.data
             ctx.body = {
                 'hi': data['hi'],
             }

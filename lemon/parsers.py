@@ -30,11 +30,11 @@ def get_content_length(headers: dict) -> typing.Optional[int]:
         raise RequestHeadersParserError
 
 
-def json_parser(body: bytes, *args) -> ImmutableMultiDict:
+def json_parser(body: bytes, *args) -> dict:
     if not body:
         raise RequestBodyParserError
     try:
-        return ImmutableMultiDict(json.loads(body.decode('utf-8')))
+        return json.loads(body.decode('utf-8'))
     except json.JSONDecodeError:
         raise RequestBodyParserError
 
@@ -63,7 +63,7 @@ DEFAULT_PARSERS_MAPPING: typing.Dict[str, typing.Callable] = {
 }
 
 
-def parse_http_body(headers: dict, body: bytes) -> typing.Optional[ImmutableMultiDict]:
+def parse_http_body(headers: dict, body: bytes) -> typing.Optional[typing.Any]:
     content_type, _ = get_mimetype_and_options(headers=headers)
     if content_type in DEFAULT_PARSERS_MAPPING:
         return DEFAULT_PARSERS_MAPPING[content_type](body, headers)
