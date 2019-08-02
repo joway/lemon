@@ -1,7 +1,6 @@
 import typing
 from urllib.parse import parse_qs
 
-from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.http import parse_cookie
 
 from lemon.const import MIME_TYPES
@@ -99,7 +98,7 @@ class Request:
         return self._query
 
     @property
-    def form(self) -> typing.Optional[ImmutableMultiDict]:
+    def form(self) -> typing.Optional[typing.Any]:
         return self.data
 
     @property
