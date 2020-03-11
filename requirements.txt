@@ -11,4 +11,4 @@ coveralls==1.11.1
 pycodestyle==2.5.0
 sphinx-rtd-theme==0.4.3
 sphinx==2.4.4
-mypy==0.761
+mypy==0.770
