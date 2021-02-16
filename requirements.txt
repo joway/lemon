@@ -10,5 +10,5 @@ pytest-asyncio==0.14.0
 coveralls==3.0.0
 pycodestyle==2.6.0
 sphinx-rtd-theme==0.5.1
-sphinx==3.5.0
+sphinx==3.5.1
 mypy==0.800
