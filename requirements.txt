@@ -4,7 +4,7 @@ kua==0.2
 werkzeug==1.0.1
 
 # dev
-pytest==6.2.2
+pytest==6.2.3
 pytest-runner==5.3.0
 pytest-asyncio==0.14.0
 coveralls==3.0.1
