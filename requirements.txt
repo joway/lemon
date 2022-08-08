@@ -1,7 +1,7 @@
 # production
 uvicorn==0.14.0
 kua==0.2
-werkzeug==1.0.1
+werkzeug==2.2.2
 
 # dev
 pytest==6.2.4
